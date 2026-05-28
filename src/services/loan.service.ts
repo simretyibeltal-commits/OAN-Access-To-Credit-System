@@ -27,14 +27,38 @@ async function fetchApi(path: string, options: RequestInit = {}) {
     headers,
   });
 
+  let responseData;
+  try {
+    responseData = await response.json();
+  } catch (e) {
+    if (!response.ok) throw new Error(`API Request failed with status ${response.status}`);
+    return null;
+  }
+
   if (!response.ok) {
     if (response.status === 401 || response.status === 403) {
       throw new Error('UNAUTHORIZED');
     }
-    throw new Error(`API Request failed with status ${response.status}`);
+    let errorMsg = `API Request failed with status ${response.status}`;
+    if (responseData?.message?.message) {
+      errorMsg = responseData.message.message;
+    } else if (responseData?.message) {
+      errorMsg = typeof responseData.message === 'string' ? responseData.message : JSON.stringify(responseData.message);
+    } else if (responseData?._server_messages) {
+      try {
+        const msgs = JSON.parse(responseData._server_messages);
+        errorMsg = JSON.parse(msgs[0]).message;
+      } catch (e) {}
+    }
+    throw new Error(errorMsg);
   }
 
-  return response.json();
+  // Handle Frappe's "200 OK" application-level errors
+  if (responseData?.message?.status === 'error') {
+    throw new Error(responseData.message.message || 'Application Error');
+  }
+
+  return responseData;
 }
 
 export const loanService = {
@@ -122,6 +146,20 @@ export const loanService = {
     return fetchApi('oan_a2c.api.loan_app_api.get_consent_data', {
       method: 'POST',
       body: JSON.stringify({ application_id }),
+    });
+  },
+
+  async sendOtpAndCreateConsent(data: any): Promise<any> {
+    return fetchApi('oan_a2c.consent.consent.send_otp_and_create_consent', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  async verifyOtp(data: { consent_request: string; otp_code: string }): Promise<any> {
+    return fetchApi('oan_a2c.consent.consent.verify_otp', {
+      method: 'POST',
+      body: JSON.stringify(data),
     });
   },
 

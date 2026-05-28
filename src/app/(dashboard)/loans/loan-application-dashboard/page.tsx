@@ -144,7 +144,10 @@ const isWithinDateRange = (row: any, range: any) => {
 function LoanApplicationDashboard() {
   const { data: rawActivityData, isLoading } = useLoans();
   const { data: rawSummaryData } = useLoanSummary();
-  const activityRows = rawActivityData?.message || rawActivityData?.data || rawActivityData || [];
+  let activityRows = rawActivityData?.message || rawActivityData?.data || rawActivityData || [];
+  if (!Array.isArray(activityRows)) {
+    activityRows = Array.isArray(activityRows.data) ? activityRows.data : (Array.isArray(activityRows.applications) ? activityRows.applications : []);
+  }
   const summaryData = rawSummaryData?.message || rawSummaryData?.data || rawSummaryData || {};
   const [activityPage, setActivityPage] = useState(1);
   const [selectedStatuses, setSelectedStatuses] = useState(new Set(ALL_STATUS_VALUES));

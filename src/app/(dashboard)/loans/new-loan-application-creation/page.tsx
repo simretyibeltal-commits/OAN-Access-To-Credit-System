@@ -11,7 +11,7 @@ import { useRouter } from 'next/navigation';
 import { ReactNode } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectLoanFormState, setStep, updateFormData, setApplicationId, resetForm } from '@/features/loans/store/loanFormSlice';
-import { useSaveLoanDetails, useSaveBankDetails, useSaveFarmerDetails, useSubmitApplication, useUploadDocument } from '@/features/loans/hooks/useLoans';
+import { useSaveLoanDetails, useSaveBankDetails, useSaveFarmerDetails, useSubmitApplication, useUploadDocument, useConsentApis } from '@/features/loans/hooks/useLoans';
 
 export interface FormState {
   [key: string]: any;
@@ -388,19 +388,19 @@ function StepFarmerDetails({ form, setField, errors }: StepProps) {
         <div className="flex flex-col gap-4">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
 
-            <TextField id="fullName" label="Full Name" placeholder="Amit" value={form.fullName} onChange={setField('fullName')} required error={errors?.fullName} readOnly />
-            <TextField id="lastName" label="Last Name" placeholder="Sharma" value={form.lastName} onChange={setField('lastName')} required readOnly />
+            <TextField id="fullName" label="Full Name" placeholder="Amit" value={form.fullName} onChange={setField('fullName')} required error={errors?.fullName} />
+            <TextField id="lastName" label="Last Name" placeholder="Sharma" value={form.lastName} onChange={setField('lastName')} required />
 
-            <TextField id="mobilePhone" label="Mobile Phone" placeholder="+251 9876543210" value={form.mobilePhone} onChange={setField('mobilePhone')} required type="tel" error={errors?.mobilePhone} readOnly />
+            <TextField id="mobilePhone" label="Mobile Phone" placeholder="+251 9876543210" value={form.mobilePhone} onChange={setField('mobilePhone')} required type="tel" error={errors?.mobilePhone} />
 
-            <DatePickerField id="dateOfBirth" label="Date of Birth" value={form.dateOfBirth} onChange={setField('dateOfBirth')} required error={errors?.dateOfBirth} disabled />
+            <DatePickerField id="dateOfBirth" label="Date of Birth" value={form.dateOfBirth} onChange={setField('dateOfBirth')} required error={errors?.dateOfBirth} />
 
-            <SelectField id="gender" label="Gender" placeholder="Select Gender" options={GENDER_OPTIONS} value={form.gender} onChange={setField('gender')} required error={errors?.gender} disabled />
-            <TextField id="woreda" label="Woreda" placeholder="Bishoftu" value={form.woreda} onChange={setField('woreda')} required readOnly />
-            <TextField id="kebele" label="Kebele" placeholder="Bishoftu" value={form.kebele} onChange={setField('kebele')} required readOnly />
-            <SelectField id="idType" label="National ID / Fayda ID Number" placeholder="Select ID Type" options={ID_TYPE_OPTIONS} value={form.idType} onChange={setField('idType')} required disabled />
-            <TextField id="idNumber" label="ID Number" placeholder="29838928923" value={form.idNumber} onChange={setField('idNumber')} required readOnly />
-            <SelectField id="language" label="Language" placeholder="Select Language" options={LANGUAGE_OPTIONS} value={form.language} onChange={setField('language')} required disabled />
+            <SelectField id="gender" label="Gender" placeholder="Select Gender" options={GENDER_OPTIONS} value={form.gender} onChange={setField('gender')} required error={errors?.gender} />
+            <TextField id="woreda" label="Woreda" placeholder="Bishoftu" value={form.woreda} onChange={setField('woreda')} required />
+            <TextField id="kebele" label="Kebele" placeholder="Bishoftu" value={form.kebele} onChange={setField('kebele')} required />
+            <SelectField id="idType" label="National ID / Fayda ID Number" placeholder="Select ID Type" options={ID_TYPE_OPTIONS} value={form.idType} onChange={setField('idType')} required />
+            <TextField id="idNumber" label="ID Number" placeholder="29838928923" value={form.idNumber} onChange={setField('idNumber')} required />
+            <SelectField id="language" label="Language" placeholder="Select Language" options={LANGUAGE_OPTIONS} value={form.language} onChange={setField('language')} required />
           </div>
         </div>
       </div>
@@ -409,11 +409,11 @@ function StepFarmerDetails({ form, setField, errors }: StepProps) {
         <SectionHeader title="Land and Crop Information" />
         <div className="flex flex-col gap-4">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <TextField id="landSizeAcres" label="Land Size (Acres)" placeholder="12" type="number" value={form.landSizeAcres} onChange={setField('landSizeAcres')} required readOnly />
-            <TextField id="farmId" label="Farm ID" placeholder="29838928923" value={form.farmId} onChange={setField('farmId')} required readOnly />
-            <TextField id="farmPolygon" label="Farm Polygon" placeholder="Farm Polygon" value={form.farmPolygon} onChange={setField('farmPolygon')} required readOnly />
-            <TextField id="landAcreage" label="Land Acreage" placeholder="Land Acreage" value={form.landAcreage} onChange={setField('landAcreage')} required readOnly />
-            <TextField id="farmLandNumber" label="Farm Land Number" placeholder="29838928923" value={form.farmLandNumber} onChange={setField('farmLandNumber')} required readOnly />
+            <TextField id="landSizeAcres" label="Land Size (Acres)" placeholder="12" type="number" value={form.landSizeAcres} onChange={setField('landSizeAcres')} required />
+            <TextField id="farmId" label="Farm ID" placeholder="29838928923" value={form.farmId} onChange={setField('farmId')} required />
+            <TextField id="farmPolygon" label="Farm Polygon" placeholder="Farm Polygon" value={form.farmPolygon} onChange={setField('farmPolygon')} required />
+            <TextField id="landAcreage" label="Land Acreage" placeholder="Land Acreage" value={form.landAcreage} onChange={setField('landAcreage')} required />
+            <TextField id="farmLandNumber" label="Farm Land Number" placeholder="29838928923" value={form.farmLandNumber} onChange={setField('farmLandNumber')} required />
           </div>
         </div>
       </div>
@@ -422,14 +422,14 @@ function StepFarmerDetails({ form, setField, errors }: StepProps) {
         <SectionHeader title="Socio-Economic Information" />
         <div className="flex flex-col gap-4">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <SelectField id="maritalStatus" label="Marital Status" placeholder="Married" options={MARITAL_OPTIONS} value={form.maritalStatus} onChange={setField('maritalStatus')} required disabled />
-            <TextField id="sizeOfFamily" label="Size of Family" placeholder="4" type="number" value={form.sizeOfFamily} onChange={setField('sizeOfFamily')} required readOnly />
-            <TextField id="numberOfChildren" label="Number of Children" placeholder="3" type="number" value={form.numberOfChildren} onChange={setField('numberOfChildren')} required readOnly />
-            <TextField id="noOfFemalesFamily" label="No. of Females (Family)" placeholder="3" type="number" value={form.noOfFemalesFamily} onChange={setField('noOfFemalesFamily')} required readOnly />
-            <TextField id="noOfMalesFamily" label="No. of Males (Family)" placeholder="3" type="number" value={form.noOfMalesFamily} onChange={setField('noOfMalesFamily')} required readOnly />
-            <TextField id="familyMemberOwnsLand" label="A Family Member Owns Land Independently" placeholder="3" type="number" value={form.familyMemberOwnsLand} onChange={setField('familyMemberOwnsLand')} required readOnly />
-            <SelectField id="sourceOfIncome" label="Source of Income" placeholder="Salary" options={SOURCE_OF_INCOME_OPTIONS} value={form.sourceOfIncome} onChange={setField('sourceOfIncome')} required disabled />
-            <SelectField id="educationLevel" label="Education Level" placeholder="Graduation" options={EDUCATION_OPTIONS} value={form.educationLevel} onChange={setField('educationLevel')} required disabled />
+            <SelectField id="maritalStatus" label="Marital Status" placeholder="Married" options={MARITAL_OPTIONS} value={form.maritalStatus} onChange={setField('maritalStatus')} required />
+            <TextField id="sizeOfFamily" label="Size of Family" placeholder="4" type="number" value={form.sizeOfFamily} onChange={setField('sizeOfFamily')} required />
+            <TextField id="numberOfChildren" label="Number of Children" placeholder="3" type="number" value={form.numberOfChildren} onChange={setField('numberOfChildren')} required />
+            <TextField id="noOfFemalesFamily" label="No. of Females (Family)" placeholder="3" type="number" value={form.noOfFemalesFamily} onChange={setField('noOfFemalesFamily')} required />
+            <TextField id="noOfMalesFamily" label="No. of Males (Family)" placeholder="3" type="number" value={form.noOfMalesFamily} onChange={setField('noOfMalesFamily')} required />
+            <TextField id="familyMemberOwnsLand" label="A Family Member Owns Land Independently" placeholder="3" type="number" value={form.familyMemberOwnsLand} onChange={setField('familyMemberOwnsLand')} required />
+            <SelectField id="sourceOfIncome" label="Source of Income" placeholder="Salary" options={SOURCE_OF_INCOME_OPTIONS} value={form.sourceOfIncome} onChange={setField('sourceOfIncome')} required />
+            <SelectField id="educationLevel" label="Education Level" placeholder="Graduation" options={EDUCATION_OPTIONS} value={form.educationLevel} onChange={setField('educationLevel')} required />
           </div>
         </div>
       </div>
@@ -438,11 +438,11 @@ function StepFarmerDetails({ form, setField, errors }: StepProps) {
         <SectionHeader title="Land, Crop and Livestock Information" />
         <div className="flex flex-col gap-4">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <TextField id="totalFarmlandLandowner" label="Total Farmland Size as Landowner" placeholder="3" type="number" value={form.totalFarmlandLandowner} onChange={setField('totalFarmlandLandowner')} required readOnly />
-            <TextField id="totalFarmlandCropSharing" label="Total Farmland Size as Crop Sharing" placeholder="4" type="number" value={form.totalFarmlandCropSharing} onChange={setField('totalFarmlandCropSharing')} required readOnly />
-            <TextField id="totalFarmlandRented" label="Total Farmland Size as Rented" placeholder="3" type="number" value={form.totalFarmlandRented} onChange={setField('totalFarmlandRented')} required readOnly />
-            <TextField id="certificationId" label="Certification ID" placeholder="29838928923" value={form.certificationId} onChange={setField('certificationId')} required readOnly />
-            <SelectField id="certificationPhoto" label="Certification Photo" placeholder="Yes" options={['Yes', 'No']} value={form.certificationPhoto} onChange={setField('certificationPhoto')} required disabled />
+            <TextField id="totalFarmlandLandowner" label="Total Farmland Size as Landowner" placeholder="3" type="number" value={form.totalFarmlandLandowner} onChange={setField('totalFarmlandLandowner')} required />
+            <TextField id="totalFarmlandCropSharing" label="Total Farmland Size as Crop Sharing" placeholder="4" type="number" value={form.totalFarmlandCropSharing} onChange={setField('totalFarmlandCropSharing')} required />
+            <TextField id="totalFarmlandRented" label="Total Farmland Size as Rented" placeholder="3" type="number" value={form.totalFarmlandRented} onChange={setField('totalFarmlandRented')} required />
+            <TextField id="certificationId" label="Certification ID" placeholder="29838928923" value={form.certificationId} onChange={setField('certificationId')} required />
+            <SelectField id="certificationPhoto" label="Certification Photo" placeholder="Yes" options={['Yes', 'No']} value={form.certificationPhoto} onChange={setField('certificationPhoto')} required />
           </div>
         </div>
       </div>
@@ -450,10 +450,10 @@ function StepFarmerDetails({ form, setField, errors }: StepProps) {
       <div className="rounded-2xl border border-gray-200 bg-white px-4 py-5 shadow-sm sm:px-6">
         <SectionHeader title="Agronomic Data" />
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <SelectField id="farmlandSizeHectares" label="Farmland Size (Hectares)" placeholder="Capacity for production" options={AGRONOMIC_FARMLAND_OPTIONS} value={form.farmlandSizeHectares} onChange={setField('farmlandSizeHectares')} required disabled />
-          <SelectField id="landOwnershipStatus" label="Land Ownership Status" placeholder="Security of access" options={LAND_OWNERSHIP_OPTIONS} value={form.landOwnershipStatus} onChange={setField('landOwnershipStatus')} required disabled />
-          <SelectField id="soilFertility" label="Soil Fertility / Minerals" placeholder="Future yield potential" options={SOIL_FERTILITY_OPTIONS} value={form.soilFertility} onChange={setField('soilFertility')} required disabled />
-          <SelectField id="moistureLevels" label="Moisture Levels" placeholder="Irrigation / drought risks" options={MOISTURE_LEVEL_OPTIONS} value={form.moistureLevels} onChange={setField('moistureLevels')} required disabled />
+          <SelectField id="farmlandSizeHectares" label="Farmland Size (Hectares)" placeholder="Capacity for production" options={AGRONOMIC_FARMLAND_OPTIONS} value={form.farmlandSizeHectares} onChange={setField('farmlandSizeHectares')} required />
+          <SelectField id="landOwnershipStatus" label="Land Ownership Status" placeholder="Security of access" options={LAND_OWNERSHIP_OPTIONS} value={form.landOwnershipStatus} onChange={setField('landOwnershipStatus')} required />
+          <SelectField id="soilFertility" label="Soil Fertility / Minerals" placeholder="Future yield potential" options={SOIL_FERTILITY_OPTIONS} value={form.soilFertility} onChange={setField('soilFertility')} required />
+          <SelectField id="moistureLevels" label="Moisture Levels" placeholder="Irrigation / drought risks" options={MOISTURE_LEVEL_OPTIONS} value={form.moistureLevels} onChange={setField('moistureLevels')} required />
         </div>
       </div>
     </div>
@@ -729,6 +729,7 @@ function StepBankDetails({ form, setField, errors }: StepProps) {
 }
 
 function Step3({ form, setField, errors }: StepProps) {
+  const { sendOtpAndCreateConsent, verifyOtp } = useConsentApis();
   const otpRefs            = useRef([]);
   const consentFileInputRef = useRef<any>(null);
   const consentAttachRef    = useRef<any>(null);
@@ -748,13 +749,39 @@ function Step3({ form, setField, errors }: StepProps) {
   }
   useEffect(() => () => clearInterval(timerRef.current), []);
 
-  function handleSendOtp() {
-    setOtpSent(true);
-    setOtpVerified(false);
+  async function handleSendOtp() {
+    if (!form.faydaId) { setOtpError('Fayda ID is required'); return; }
     setOtpError('');
     setField('otpCode')(['', '', '', '', '', '']);
-    clearInterval(timerRef.current);
-    startCountdown(102);
+    
+    try {
+      const today = new Date();
+      const nextYear = new Date();
+      nextYear.setFullYear(today.getFullYear() + 1);
+      const formatDate = (d: Date) => d.toISOString().slice(0, 19).replace('T', ' ');
+      
+      const res = await sendOtpAndCreateConsent.mutateAsync({
+          fayda_id: form.faydaId,
+          partner: 'AgriBank',
+          loan_application: '',
+          consent_form_attachment: '',
+          purpose: 'Loan Application Data Access',
+          validity_from: formatDate(today),
+          validity_to: formatDate(nextYear),
+          requested_data_fields: form.dataFields || []
+      });
+      
+      const reqId = res?.message?.data?.name || res?.message?.name || res?.message?.id || res?.data?.name || res?.message;
+      setField('consentRequestId')(reqId);
+      
+      setOtpSent(true);
+      setOtpVerified(false);
+      clearInterval(timerRef.current);
+      startCountdown(102);
+    } catch (e: any) {
+      setOtpSent(false);
+      setOtpError(e.message || 'Failed to send OTP');
+    }
   }
 
   function handleOtpChange(i: number, v: string) {
@@ -771,17 +798,24 @@ function Step3({ form, setField, errors }: StepProps) {
     if (e.key === 'Backspace' && !(form.otpCode || [])[i] && i > 0) otpRefs.current[i - 1]?.focus();
   }
 
-  function handleVerify() {
+  async function handleVerify() {
     const code = (form.otpCode || []).join('');
     if (code.length < 6) { setOtpError('Please enter all 6 digits of the OTP.'); return; }
+    if (!form.consentRequestId) { setOtpError('Consent Request ID missing. Please resend OTP.'); return; }
+    
     setVerifying(true);
     setOtpError('');
-    setTimeout(() => {
+    
+    try {
+      await verifyOtp.mutateAsync({ consent_request: form.consentRequestId, otp_code: code });
       setVerifying(false);
       setOtpVerified(true);
       clearInterval(timerRef.current);
       setCountdown(0);
-    }, 1200);
+    } catch(e: any) {
+      setVerifying(false);
+      setOtpError(e.message || 'Invalid OTP');
+    }
   }
 
   function handleConsentFileUpload(file: File) {
@@ -2204,8 +2238,9 @@ export default function NewLoanApplication() {
           expected_yield: parseFloat(form.expectedYield) || 0,
           expected_harvest_date: form.expectedHarvestDate,
         });
-        if (res?.data?.application_id) {
-          dispatch(setApplicationId(res.data.application_id));
+        const newAppId = res?.message?.data?.application_id || res?.message?.application_id || res?.data?.application_id;
+        if (newAppId) {
+          dispatch(setApplicationId(newAppId));
         }
       } else if (currentStep === 2) {
         if (!applicationId) throw new Error("Application ID is missing");
@@ -2218,13 +2253,18 @@ export default function NewLoanApplication() {
         });
       } else if (currentStep === 3) {
         if (!applicationId) throw new Error("Application ID is missing");
+        const DOC_TYPE_MAP: Record<string, string> = {
+          marriageCert: 'Marriage Certificate',
+          identityDoc: 'Identity Document',
+          landOwnerProof: 'Land Ownership Proof',
+        };
         const docKeys = Object.keys(step5Uploads);
         for (const key of docKeys) {
           const entry = (step5Uploads as Record<string, any>)[key];
           if (entry && entry.file) {
              await uploadDocument.mutateAsync({ 
                application_id: applicationId, 
-               document_type: key, 
+               document_type: DOC_TYPE_MAP[key] || key, 
                file: entry.file 
              });
           }

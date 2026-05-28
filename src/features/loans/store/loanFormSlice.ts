@@ -8,12 +8,26 @@ interface LoanFormState {
   uploads: Record<string, any>;
 }
 
-const initialState: LoanFormState = {
-  currentStep: 1,
-  applicationId: null,
-  formData: {},
-  uploads: {},
+const loadInitialState = (): LoanFormState => {
+  if (typeof window !== 'undefined') {
+    const saved = localStorage.getItem('loan_form_state');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        console.error('Failed to parse saved loan form state');
+      }
+    }
+  }
+  return {
+    currentStep: 1,
+    applicationId: null,
+    formData: {},
+    uploads: {},
+  };
 };
+
+const initialState: LoanFormState = loadInitialState();
 
 export const loanFormSlice = createSlice({
   name: 'loanForm',
@@ -41,7 +55,15 @@ export const loanFormSlice = createSlice({
         state.currentStep -= 1;
       }
     },
-    resetForm: () => initialState,
+    resetForm: () => {
+      if (typeof window !== 'undefined') localStorage.removeItem('loan_form_state');
+      return {
+        currentStep: 1,
+        applicationId: null,
+        formData: {},
+        uploads: {},
+      };
+    },
   },
 });
 

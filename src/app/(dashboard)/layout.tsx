@@ -73,6 +73,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     }
   }, [pathname, router]);
 
+  // update the title of the page
   useEffect(() => {
     document.title = `${pageTitle} | Open AgriNet`;
   }, [pageTitle]);

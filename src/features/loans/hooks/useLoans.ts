@@ -109,3 +109,9 @@ export function useUpdateLoanStatus() {
     },
   });
 }
+
+export function useConsentApis() {
+  const sendOtpAndCreateConsent = useMutation({ mutationFn: loanService.sendOtpAndCreateConsent });
+  const verifyOtp = useMutation({ mutationFn: loanService.verifyOtp });
+  return { sendOtpAndCreateConsent, verifyOtp };
+}
