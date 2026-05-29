@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { ReactNode } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { selectLoanFormState, setStep, updateFormData, setApplicationId, resetForm } from '@/features/loans/store/loanFormSlice';
 import { useSaveLoanDetails, useSaveBankDetails, useSaveFarmerDetails, useSubmitApplication, useUploadDocument, useConsentApis } from '@/features/loans/hooks/useLoans';
 import {
@@ -2149,8 +2149,8 @@ function Step7({ form, submittedAt, appId }: { form: FormState, submittedAt: str
 
 export default function NewLoanApplication() {
   const router = useRouter();
-  const dispatch = useDispatch();
-  const { currentStep, applicationId, formData: form } = useSelector(selectLoanFormState);
+  const dispatch = useAppDispatch();
+  const { currentStep, applicationId, formData: form } = useAppSelector(selectLoanFormState);
   
   const [errors, setErrors] = useState({});
   const [step5Uploads, setStep5Uploads] = useState({});

@@ -2,23 +2,23 @@ import type { Lead, GetLeadsParams, GetLeadsResponse } from '@/features/leads/ty
 
 export const leadService = {
   async getLeads(params?: GetLeadsParams): Promise<GetLeadsResponse> {
-    const url = new URL(
-      '/api/proxy/api/method/oan_a2c.api.v1.leads.get_leads',
-      typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000'
-    );
-    
-    url.searchParams.append('start', params?.start?.toString() || '0');
-    url.searchParams.append('page_length', params?.page_length?.toString() || '20');
-    url.searchParams.append('search_query', params?.search_query || '');
-    url.searchParams.append('status', params?.status || '');
-    url.searchParams.append('lead_source', params?.lead_source || '');
-    url.searchParams.append('start_date', params?.start_date || '');
-    url.searchParams.append('end_date', params?.end_date || '');
+    const searchParams = new URLSearchParams({
+      start: params?.start?.toString() || '0',
+      page_length: params?.page_length?.toString() || '20',
+      search_query: params?.search_query || '',
+      status: params?.status || '',
+      lead_source: params?.lead_source || '',
+      start_date: params?.start_date || '',
+      end_date: params?.end_date || '',
+    });
+
     if (params?.assigned_to !== undefined) {
-      url.searchParams.append('assigned_to', params.assigned_to);
+      searchParams.append('assigned_to', params.assigned_to);
     }
 
-    const response = await fetch(url.toString());
+    const response = await fetch(
+      `/api/proxy/api/method/oan_a2c.api.v1.leads.get_leads?${searchParams.toString()}`
+    );
     if (!response.ok) {
       if (response.status === 401 || response.status === 403) {
         throw new Error('UNAUTHORIZED');
@@ -49,11 +49,7 @@ export const leadService = {
   },
 
   async getLeadSummary(): Promise<any> {
-    const url = new URL(
-      '/api/proxy/api/method/oan_a2c.api.v1.leads.get_lead_summary',
-      typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000'
-    );
-    const response = await fetch(url.toString());
+    const response = await fetch('/api/proxy/api/method/oan_a2c.api.v1.leads.get_lead_summary');
     if (!response.ok) {
       if (response.status === 401 || response.status === 403) {
         throw new Error('UNAUTHORIZED');

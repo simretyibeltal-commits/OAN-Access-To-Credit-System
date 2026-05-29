@@ -2,8 +2,8 @@
 
 import React, { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { useSelector, useDispatch } from 'react-redux';
 import { useQueryClient } from '@tanstack/react-query';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { Clock3, FileText, ListChecks, Plus, SquarePen, Users } from 'lucide-react';
 import Sidebar from '@/components/Sidebar';
 import TopHeader from '@/components/TopHeader';
@@ -57,21 +57,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const queryClient = useQueryClient();
 
-  const isAuthenticated = useSelector(selectIsAuthenticated);
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
 
   const pageTitle = PAGE_TITLES[pathname] ?? 'Dashboard';
 
-  useEffect(() => {
-    // Simple client-side auth guard. Server-side or middleware is preferred in prod, 
-    // but this pairs with the existing localStorage hydration and QueryCache error handler.
-    const cachedUser = localStorage.getItem('auth_user');
-    if (!cachedUser) {
-      router.push('/login');
-    }
-  }, [pathname, router]);
+
 
   // update the title of the page
   useEffect(() => {
@@ -108,7 +101,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           isSidebarCollapsed={isSidebarCollapsed}
           onToggleSidebar={handleToggleSidebar}
           onLogout={async () => {
-            await fetch('/api/auth/logout', { method: 'POST' }).catch(() => {});
+            await fetch('/api/auth/logout', { method: 'POST' }).catch(() => { });
             dispatch(logoutAction());
             queryClient.clear();
             router.push('/login');

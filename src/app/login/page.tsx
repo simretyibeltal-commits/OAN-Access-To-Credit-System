@@ -11,11 +11,10 @@ import {
   UserRound,
   Lock,
 } from 'lucide-react';
-import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/navigation';
 
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { loginThunk, selectAuthError, selectAuthStatus, clearAuthError } from '@/features/auth/store/authSlice';
-import type { AppDispatch } from '@/store';
 
 
 
@@ -34,9 +33,9 @@ const languages = [
 
 export default function Login() {
   const router = useRouter();
-  const dispatch = useDispatch<AppDispatch>();
-  const authStatus = useSelector(selectAuthStatus);
-  const authError = useSelector(selectAuthError);
+  const dispatch = useAppDispatch();
+  const authStatus = useAppSelector(selectAuthStatus);
+  const authError = useAppSelector(selectAuthError);
   const isLoading = authStatus === 'loading';
 
   const [activeLanguage, setActiveLanguage] = useState(languages[0]);

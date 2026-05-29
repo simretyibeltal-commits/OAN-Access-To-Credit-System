@@ -11,7 +11,7 @@ import {
   Settings,
   UserRound,
 } from 'lucide-react';
-import { useSelector } from 'react-redux';
+import { useAppSelector } from '@/store/hooks';
 import { selectOfficerName, selectOfficerRole } from '@/features/auth/store/authSlice';
 
 import menuToggleArrow from './menu-toggle-arrow.svg';
@@ -42,8 +42,8 @@ function TopHeader({ isSidebarCollapsed, onToggleSidebar, onLogout, pageTitle = 
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const profileMenuRef = useRef<HTMLDivElement>(null);
   
-  const rawOfficerName = useSelector(selectOfficerName);
-  const rawOfficerRole = useSelector(selectOfficerRole);
+  const rawOfficerName = useAppSelector(selectOfficerName);
+  const rawOfficerRole = useAppSelector(selectOfficerRole);
 
   const officerName = rawOfficerName || 'Guest User';
   const officerRole = rawOfficerRole || 'Loan Officer';

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { SlidersHorizontal, X, Check, Phone, Calendar } from 'lucide-react';
 import { STATUS_CFG, STATUS_OPTS } from '../constants/leads.constants';
 import { selectAdvFilters, setAdvFilters, resetFilters } from '../store/leadSlice';
@@ -9,8 +9,8 @@ interface LeadAdvancedFiltersProps {
 }
 
 function LeadAdvancedFilters({ onClose }: LeadAdvancedFiltersProps) {
-  const dispatch = useDispatch();
-  const activeFilters = useSelector(selectAdvFilters);
+  const dispatch = useAppDispatch();
+  const activeFilters = useAppSelector(selectAdvFilters);
 
   const CALL_STATUS_OPTS = ['All', 'Completed', 'Missed', 'Voicemail'];
   const QUICK_DATE_OPTS  = ['Today', 'Last 7 Days', 'Last 30 Days', 'This Month'];

@@ -11,7 +11,7 @@ import LeadTable from '@/features/leads/components/LeadTable';
 import LeadPagination from '@/features/leads/components/LeadPagination';
 import LeadAdvancedFilters from '@/features/leads/components/LeadAdvancedFilters';
 import LeadLoadingSkeleton from '@/features/leads/components/LeadLoadingSkeleton';
-import { useDispatch, useSelector } from 'react-redux';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import {
   fetchLeads,
   fetchLeadSummary,
@@ -32,22 +32,21 @@ import {
   selectTotalCount,
   selectAdvFilters,
 } from '@/features/leads/store/leadSlice';
-import type { AppDispatch } from '@/store';
 
 export default function LeadsDashboard() {
   const router = useRouter();
-  const dispatch = useDispatch<AppDispatch>();
-  const allLeads = useSelector(selectLeads) || [];
-  const isLoading = useSelector(selectIsLeadsLoading);
-  const leadSummary = useSelector(selectLeadSummary);
-  const totalCount = useSelector(selectTotalCount);
+  const dispatch = useAppDispatch();
+  const allLeads = useAppSelector(selectLeads) || [];
+  const isLoading = useAppSelector(selectIsLeadsLoading);
+  const leadSummary = useAppSelector(selectLeadSummary);
+  const totalCount = useAppSelector(selectTotalCount);
 
-  const search = useSelector(selectSearch);
-  const activeTab = useSelector(selectActiveTab);
-  const dateFilter = useSelector(selectDateFilter);
-  const colStatusFilter = useSelector(selectColStatusFilter);
-  const colCallTimeFilter = useSelector(selectColCallTimeFilter);
-  const advFilters = useSelector(selectAdvFilters);
+  const search = useAppSelector(selectSearch);
+  const activeTab = useAppSelector(selectActiveTab);
+  const dateFilter = useAppSelector(selectDateFilter);
+  const colStatusFilter = useAppSelector(selectColStatusFilter);
+  const colCallTimeFilter = useAppSelector(selectColCallTimeFilter);
+  const advFilters = useAppSelector(selectAdvFilters);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [showAdvFilters, setShowAdvFilters] = useState(false);
