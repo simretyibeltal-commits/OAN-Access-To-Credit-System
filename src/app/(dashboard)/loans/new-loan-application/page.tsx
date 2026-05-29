@@ -328,7 +328,7 @@ function TextAreaField({ id, label, placeholder, value, onChange, required, rows
 
 function FormSectionCard({ title, children }: { title: string, children: ReactNode }) {
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white px-4 py-5 shadow-sm sm:px-6">
+    <div className="rounded-2xl border border-gray-200 bg-white px-4 py-5 shadow-sm hover:shadow-lg hover:-translate-y-1 hover:border-[#16A34A]/50 transition-all duration-300 sm:px-6">
       <div className="mb-5 border-b border-gray-100 pb-4">
         <h2 className="text-base font-semibold text-gray-800">{title}</h2>
       </div>
@@ -339,7 +339,7 @@ function FormSectionCard({ title, children }: { title: string, children: ReactNo
 
 function StepProgressBar({ currentStep }: { currentStep: number }) {
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white px-4 py-4 shadow-sm sm:px-6 overflow-x-auto">
+    <div className="rounded-2xl border border-gray-200 bg-white px-4 py-4 shadow-sm hover:shadow-lg hover:-translate-y-1 hover:border-[#16A34A]/50 transition-all duration-300 sm:px-6 overflow-x-auto">
       <div className="flex items-start gap-0 min-w-[720px] md:min-w-0">
         {STEPS.map(step => {
           const isDone = step.number < currentStep;
@@ -367,17 +367,17 @@ function StepProgressBar({ currentStep }: { currentStep: number }) {
 
 function StepFarmerDetails({ form, setField, errors }: StepProps) {
   const SectionHeader = ({ title }) => (
-    <div className="mb-4 flex items-center gap-2 border-b border-gray-100 pb-3">
+    <div className="mb-4 flex items-center gap-2 border-b border-gray-200 pb-3">
       <h3 className="text-sm font-semibold text-gray-800">{title}</h3>
     </div>
   );
 
   return (
     <div className="flex flex-col gap-5">
-      <div className="rounded-2xl border border-gray-200 bg-white px-4 py-5 shadow-sm sm:px-6">
+      <div className="rounded-2xl border border-gray-100 bg-white px-4 py-6 shadow-sm hover:shadow-lg hover:-translate-y-1 hover:border-[#16A34A]/50 transition-all duration-300 sm:px-6">
         <SectionHeader title="Basic Information" />
         <div className="flex flex-col gap-4">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             <TextField id="fullName" label="First Name" placeholder="Amit" value={form.fullName} onChange={setField('fullName')} required error={errors.fullName} readOnly />
             <TextField id="lastName" label="Last Name" placeholder="Sharma" value={form.lastName} onChange={setField('lastName')} required readOnly />
             <TextField id="mobilePhone" label="Mobile Phone" placeholder="+251 9876543210" value={form.mobilePhone} onChange={setField('mobilePhone')} required type="tel" error={errors.mobilePhone} readOnly />
@@ -392,10 +392,10 @@ function StepFarmerDetails({ form, setField, errors }: StepProps) {
         </div>
       </div>
 
-      <div className="rounded-2xl border border-gray-200 bg-white px-4 py-5 shadow-sm sm:px-6">
+      <div className="rounded-2xl border border-gray-100 bg-white px-4 py-6 shadow-sm hover:shadow-lg hover:-translate-y-1 hover:border-[#16A34A]/50 transition-all duration-300 sm:px-6">
         <SectionHeader title="Land and Crop Information" />
         <div className="flex flex-col gap-4">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             <TextField id="landSizeAcres" label="Land Size (Acres)" placeholder="12" type="number" value={form.landSizeAcres} onChange={setField('landSizeAcres')} required readOnly />
             <TextField id="farmId" label="Farm ID" placeholder="29838928923" value={form.farmId} onChange={setField('farmId')} required readOnly />
             <TextField id="farmPolygon" label="Farm Polygon" placeholder="Farm Polygon" value={form.farmPolygon} onChange={setField('farmPolygon')} required readOnly />
@@ -405,10 +405,10 @@ function StepFarmerDetails({ form, setField, errors }: StepProps) {
         </div>
       </div>
 
-      <div className="rounded-2xl border border-gray-200 bg-white px-4 py-5 shadow-sm sm:px-6">
+      <div className="rounded-2xl border border-gray-100 bg-white px-4 py-6 shadow-sm hover:shadow-lg hover:-translate-y-1 hover:border-[#16A34A]/50 transition-all duration-300 sm:px-6">
         <SectionHeader title="Socio-Economic Information" />
         <div className="flex flex-col gap-4">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             <SelectField id="maritalStatus" label="Marital Status" placeholder="Married" options={MARITAL_OPTIONS} value={form.maritalStatus} onChange={setField('maritalStatus')} required disabled />
             <TextField id="sizeOfFamily" label="Size of Family" placeholder="4" type="number" value={form.sizeOfFamily} onChange={setField('sizeOfFamily')} required readOnly />
             <TextField id="numberOfChildren" label="Number of Children" placeholder="3" type="number" value={form.numberOfChildren} onChange={setField('numberOfChildren')} required readOnly />
@@ -421,10 +421,10 @@ function StepFarmerDetails({ form, setField, errors }: StepProps) {
         </div>
       </div>
 
-      <div className="rounded-2xl border border-gray-200 bg-white px-4 py-5 shadow-sm sm:px-6">
+      <div className="rounded-2xl border border-gray-100 bg-white px-4 py-6 shadow-sm hover:shadow-lg hover:-translate-y-1 hover:border-[#16A34A]/50 transition-all duration-300 sm:px-6">
         <SectionHeader title="Land, Crop and Livestock Information" />
         <div className="flex flex-col gap-4">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             <TextField id="totalFarmlandLandowner" label="Total Farmland Size as Landowner" placeholder="3" type="number" value={form.totalFarmlandLandowner} onChange={setField('totalFarmlandLandowner')} required readOnly />
             <TextField id="totalFarmlandCropSharing" label="Total Farmland Size as Crop Sharing" placeholder="4" type="number" value={form.totalFarmlandCropSharing} onChange={setField('totalFarmlandCropSharing')} required readOnly />
             <TextField id="totalFarmlandRented" label="Total Farmland Size as Rented" placeholder="3" type="number" value={form.totalFarmlandRented} onChange={setField('totalFarmlandRented')} required readOnly />
@@ -434,9 +434,9 @@ function StepFarmerDetails({ form, setField, errors }: StepProps) {
         </div>
       </div>
 
-      <div className="rounded-2xl border border-gray-200 bg-white px-4 py-5 shadow-sm sm:px-6">
+      <div className="rounded-2xl border border-gray-100 bg-white px-4 py-6 shadow-sm hover:shadow-lg hover:-translate-y-1 hover:border-[#16A34A]/50 transition-all duration-300 sm:px-6">
         <SectionHeader title="Agronomic Data" />
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
           <SelectField id="farmlandSizeHectares" label="Farmland Size (Hectares)" placeholder="Capacity for production" options={AGRONOMIC_FARMLAND_OPTIONS} value={form.farmlandSizeHectares} onChange={setField('farmlandSizeHectares')} required disabled />
           <SelectField id="landOwnershipStatus" label="Land Ownership Status" placeholder="Security of access" options={LAND_OWNERSHIP_OPTIONS} value={form.landOwnershipStatus} onChange={setField('landOwnershipStatus')} required disabled />
           <SelectField id="soilFertility" label="Soil Fertility / Minerals" placeholder="Future yield potential" options={SOIL_FERTILITY_OPTIONS} value={form.soilFertility} onChange={setField('soilFertility')} required disabled />
@@ -454,6 +454,36 @@ function StepConsentAndDocs({ form, setField, uploads, setUploads }: Step5Props)
   const extraInputRef = useRef<HTMLInputElement>(null);
   const consentInputRef = useRef<HTMLInputElement>(null);
   const [viewingConsent, setViewingConsent] = useState(false);
+  const [showOtpVerification, setShowOtpVerification] = useState(false);
+  const [otp, setOtp] = useState(['', '', '', '', '', '']);
+  const otpInputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const [otpStatus, setOtpStatus] = useState<'idle' | 'success' | 'error'>('idle');
+
+  const handleVerifyOtp = () => {
+    const enteredOtp = otp.join('');
+    // Mock condition for demonstration. Let's assume '123456' is correct.
+    if (enteredOtp.length === 6 && enteredOtp === '123456') {
+      setOtpStatus('success');
+    } else {
+      setOtpStatus('error');
+    }
+  };
+
+  const handleOtpChange = (index: number, value: string) => {
+    if (!/^\d*$/.test(value)) return;
+    const newOtp = [...otp];
+    newOtp[index] = value.slice(-1);
+    setOtp(newOtp);
+    if (value && index < 5) {
+      otpInputRefs.current[index + 1]?.focus();
+    }
+  };
+
+  const handleOtpKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Backspace' && !otp[index] && index > 0) {
+      otpInputRefs.current[index - 1]?.focus();
+    }
+  };
 
   const INLINE_DOCS = [
     { id: 'identityDoc', label: 'Identity Document', sub: 'National ID, Passport, or Kebele ID', required: true, showCamera: false },
@@ -487,17 +517,18 @@ function StepConsentAndDocs({ form, setField, uploads, setUploads }: Step5Props)
     <div className="flex flex-col gap-5">
       {viewingConsent && uploads['consentForm'] && <ViewFileModal entry={uploads['consentForm']} label="Signed Consent Form" onClose={() => setViewingConsent(false)} />}
       {viewingExtra && <ViewFileModal entry={viewingExtra} label="Additional Document" onClose={() => setViewingExtra(null)} />}
-      <div className="rounded-2xl border border-gray-200 bg-white px-4 py-5 shadow-sm sm:px-6">
+      <div className="rounded-2xl border border-gray-200 bg-white px-4 py-5 shadow-sm hover:shadow-lg hover:-translate-y-1 hover:border-[#16A34A]/50 transition-all duration-300 sm:px-6">
         <h2 className="mb-5 border-b border-gray-200 pb-4 text-base font-semibold text-gray-800">Consent Form</h2>
-        <div className="flex flex-col gap-5">
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-            <div className="flex flex-col gap-4">
-              <TextField id="faydaIdReadOnly" label="Farmer ID / Fayda ID" value="************" readOnly />
-              <div className="flex items-center gap-2">
-                <Check size={16} className="text-[#16A34A]" strokeWidth={3} />
-                <span className="text-xs font-medium text-gray-500">Consent provided on May 25, 2026</span>
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+          <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-medium text-gray-700">Farmer ID / Fayda ID</label>
+              <div className="flex items-center gap-3">
+                <input type="text" placeholder="Search by Farmer ID or National ID" className="flex-1 rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm shadow-sm placeholder:text-gray-400 focus:border-[#16A34A] focus:outline-none focus:ring-2 focus:ring-[#16A34A]/20" />
+                <button type="button" className="rounded-lg bg-[#16A34A] px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-[#15803d] transition-colors">Search</button>
               </div>
             </div>
+
             <div>
               <div className={`relative flex flex-col rounded-xl border p-4 transition-colors ${uploads['consentForm'] || progress['consentForm'] != null ? 'border-gray-200 bg-white shadow-sm' : 'border-dashed border-gray-300 bg-gray-50'}`}>
                 <div className="mb-3 flex items-start justify-between gap-2">
@@ -506,7 +537,7 @@ function StepConsentAndDocs({ form, setField, uploads, setUploads }: Step5Props)
                     <p className="text-xs text-gray-500">Physical copy signed by farmer</p>
                   </div>
                   {progress['consentForm'] != null && progress['consentForm'] < 100 ? (
-                    <span className="flex items-center gap-1 rounded-full bg-blue-100 px-2.5 py-1 text-xs font-semibold text-blue-700">
+                    <span className="flex items-center gap-1.5 rounded-lg bg-blue-100/50 px-2.5 py-1 text-xs font-semibold text-blue-600">
                       <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-blue-500 border-t-transparent" /> Uploading
                     </span>
                   ) : uploads['consentForm'] ? (
@@ -525,13 +556,13 @@ function StepConsentAndDocs({ form, setField, uploads, setUploads }: Step5Props)
                           <div className="flex-1 min-w-0">
                             <p className="truncate text-sm font-semibold text-gray-800">{uploads['consentForm']?.file?.name || 'consent_signed_2024.pdf'}</p>
                             <div className="flex items-center justify-between mt-1">
-                              <p className="text-xs font-medium text-gray-500">{formatFileSize(uploads['consentForm']?.file?.size || 1200000)} / {formatFileSize(uploads['consentForm']?.file?.size || 1200000)}</p>
-                              <p className="text-xs font-semibold text-gray-500">{Math.round(progress['consentForm'] ?? 100)}%</p>
+                              <p className="text-xs font-medium text-gray-500">{formatFileSize(uploads['consentForm']?.file?.size || 1200000)} / {formatFileSize(uploads['consentForm']?.file?.size || 4500000)}</p>
+                              <p className="text-xs font-semibold text-gray-500">{Math.round(progress['consentForm'] ?? 45)}%</p>
                             </div>
                           </div>
                         </div>
                         <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-gray-200">
-                          <div className="h-full bg-[#16A34A] transition-all" style={{ width: `${progress['consentForm']}%` }} />
+                          <div className="h-full bg-blue-600 transition-all" style={{ width: `${progress['consentForm']}%` }} />
                         </div>
                       </div>
                     ) : (
@@ -545,10 +576,10 @@ function StepConsentAndDocs({ form, setField, uploads, setUploads }: Step5Props)
                           <span className="text-[11px] text-gray-500">Uploaded {formatUploadTime(uploads['consentForm'].uploadedAt)}</span>
                         </div>
                         <div className="flex gap-2">
-                          <button onClick={() => setViewingConsent(true)} className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-[#4a7c59]/40 bg-[#4a7c59]/5 px-3 py-2 text-xs font-semibold text-[#4a7c59] hover:bg-[#4a7c59]/10 transition-colors">
+                          <button type="button" onClick={() => setViewingConsent(true)} className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-[#4a7c59]/40 bg-[#4a7c59]/5 px-3 py-2 text-xs font-semibold text-[#4a7c59] hover:bg-[#4a7c59]/10 transition-colors">
                             <Eye size={12} /> View
                           </button>
-                          <button onClick={() => removeUpload('consentForm')} className="flex items-center justify-center rounded-lg border border-red-200 bg-red-50 px-2.5 py-2 text-xs text-red-500 hover:bg-red-100 transition-colors">
+                          <button type="button" onClick={() => removeUpload('consentForm')} className="flex items-center justify-center rounded-lg border border-red-200 bg-red-50 px-2.5 py-2 text-xs text-red-500 hover:bg-red-100 transition-colors">
                             <X size={13} />
                           </button>
                         </div>
@@ -560,7 +591,7 @@ function StepConsentAndDocs({ form, setField, uploads, setUploads }: Step5Props)
                     <div className="flex h-10 w-10 items-center justify-center rounded-full border border-dashed border-gray-300 bg-white">
                       <Upload size={16} className="text-gray-400" />
                     </div>
-                    <button type="button" onClick={() => consentInputRef.current?.click()} className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors shadow-sm">
+                    <button type="button" onClick={() => consentInputRef.current?.click()} className="rounded-lg border border-gray-300 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-400 hover:shadow-sm transition-all shadow-sm">
                       Browse Files
                     </button>
                   </div>
@@ -568,22 +599,77 @@ function StepConsentAndDocs({ form, setField, uploads, setUploads }: Step5Props)
               </div>
               <input ref={consentInputRef} type="file" accept=".pdf,.jpg,.jpeg,.png" className="hidden" onChange={e => { if (e.target.files?.[0]) handleUpload('consentForm', e.target.files[0]); e.target.value = ''; }} />
             </div>
-          </div>
-          <div>
-            <label className="mb-2 block text-sm font-medium text-gray-700">Data fields requested as part of Agriloan Consent <span className="text-red-500">*</span></label>
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-              {['Basic Profile (Required)', 'Phone Number', 'Farm Details & Location'].map(field => (
-                <div key={field} className="flex items-center gap-2 rounded-lg border border-[#16A34A] bg-[#16A34A]/5 px-4 py-3">
-                  <div className="h-2 w-2 rounded-full bg-[#16A34A]" />
-                  <span className="text-sm font-medium text-gray-800">{field}</span>
-                </div>
-              ))}
+
+            <div className="flex items-start gap-3 rounded-xl border border-blue-100 bg-[#f4f8ff] p-4">
+              <Info className="mt-0.5 shrink-0 text-blue-500" size={18} />
+              <div>
+                <p className="text-sm font-semibold text-[#2563eb]">Consent Authorization</p>
+                <p className="mt-1 text-xs text-blue-700/80 leading-relaxed">
+                  By requesting OTP, you confirm the farmer is present and has verbally agreed to share their registry data with AgriBank for the purpose of this loan application.
+                </p>
+              </div>
             </div>
+
+            <button type="button" onClick={() => setShowOtpVerification(true)} className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#16A34A] py-3 text-sm font-medium text-white shadow-sm hover:bg-[#15803d] transition-colors">
+              <Send size={16} /> Send OTP Request
+            </button>
           </div>
+
+          {showOtpVerification && (
+            <div className="flex flex-col items-center justify-center rounded-2xl border border-gray-100 bg-[#f9fafb] p-8 h-full">
+              <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-white shadow-sm border border-gray-100">
+                <Smartphone className="text-[#16A34A] animate-bounce" size={24} />
+              </div>
+              <h3 className="mb-3 text-lg font-bold text-gray-800">Fayda OTP Verification</h3>
+              <p className="text-center text-sm text-gray-500">
+                OTP sent to <span className="font-semibold text-gray-700">091****645</span>.<br />
+                Ask the farmer to provide the 6-digit code.
+              </p>
+
+              <div className="mt-6 flex justify-center gap-2">
+                {otp.map((digit, i) => (
+                  <input
+                    key={i}
+                    type="text"
+                    maxLength={1}
+                    value={digit}
+                    onChange={(e) => { setOtpStatus('idle'); handleOtpChange(i, e.target.value); }}
+                    onKeyDown={(e) => handleOtpKeyDown(i, e)}
+                    ref={(el) => { otpInputRefs.current[i] = el; }}
+                    className={`h-12 w-10 sm:h-14 sm:w-12 rounded-lg border text-center text-xl font-semibold text-gray-800 shadow-sm focus:outline-none focus:ring-2 ${otpStatus === 'error'
+                      ? 'border-red-300 bg-red-50 focus:border-red-400 focus:ring-red-200'
+                      : otpStatus === 'success'
+                        ? 'border-green-300 bg-green-50 focus:border-green-400 focus:ring-green-200'
+                        : 'border-gray-200 bg-white focus:border-[#16A34A] focus:ring-[#16A34A]/20'
+                      }`}
+                  />
+                ))}
+              </div>
+
+              {otpStatus === 'success' && (
+                <p className="mt-4 text-sm font-medium text-green-600 bg-green-50 border border-green-100 px-4 py-2 rounded-lg">
+                  OTP Verified Successfully!
+                </p>
+              )}
+              {otpStatus === 'error' && (
+                <p className="mt-4 text-sm font-medium text-red-600 bg-red-50 border border-red-100 px-4 py-2 rounded-lg">
+                  Incorrect OTP. Please try again.
+                </p>
+              )}
+
+              <button type="button" onClick={handleVerifyOtp} className="mt-6 w-full rounded-lg bg-[#16A34A] py-3 text-sm font-medium text-white shadow-sm hover:bg-[#15803d] transition-colors max-w-[280px]">
+                Verify Code
+              </button>
+
+              <p className="mt-5 text-xs text-gray-500">
+                Didn't receive code? <button type="button" className="font-medium text-gray-400 hover:text-gray-600 transition-colors">Resend in 01:42</button>
+              </p>
+            </div>
+          )}
         </div>
       </div>
 
-      <div className="rounded-2xl border border-gray-200 bg-white px-4 py-5 shadow-sm sm:px-6">
+      <div className="rounded-2xl border border-gray-200 bg-white px-4 py-5 shadow-sm hover:shadow-lg hover:-translate-y-1 hover:border-[#16A34A]/50 transition-all duration-300 sm:px-6">
         <h2 className="mb-5 flex items-center gap-1 text-base font-semibold text-gray-800 pb-4 border-b border-gray-200 "><span className="text-red-500">*</span> Required Documents</h2>
         <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
           <DocUploadCard doc={INLINE_DOCS[0]} entry={uploads[INLINE_DOCS[0].id]} uploadProgress={progress[INLINE_DOCS[0].id]} showCamera={INLINE_DOCS[0].showCamera} onUpload={f => handleUpload(INLINE_DOCS[0].id, f)} onRemove={() => removeUpload(INLINE_DOCS[0].id)} />
@@ -786,13 +872,13 @@ function DocUploadCard({ doc, entry, onUpload, onRemove, uploadProgress, showCam
             <div className="flex gap-2">
               <button
                 onClick={() => fileRef.current?.click()}
-                className="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+                className="rounded-lg border border-gray-300 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-400 hover:shadow-sm transition-all">
                 Browse Files
               </button>
               {showCamera && (
                 <button
                   onClick={() => cameraRef.current?.click()}
-                  className="flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+                  className="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-400 hover:shadow-sm transition-all">
                   📷 Camera
                 </button>
               )}
@@ -816,44 +902,59 @@ const REVIEW_SECTIONS = [
 
 function ReviewSection({ section, expanded, onToggle, goToStep }: { section: any, expanded: boolean, onToggle: () => void, goToStep: (step: number) => void }) {
   const statusConfig: Record<string, any> = {
-    complete: { label: 'Complete', bg: 'bg-green-100', text: 'text-green-700', icon: <Check size={12} strokeWidth={3} /> },
-    verified: { label: 'Verified', bg: 'bg-green-100', text: 'text-green-700', icon: <Check size={12} strokeWidth={3} /> },
+    complete: { label: 'Complete', bg: 'bg-green-100', text: 'text-green-700', icon: <Check size={14} strokeWidth={3} /> },
+    verified: { label: 'Verified', bg: 'bg-green-100', text: 'text-green-700', icon: <Check size={14} strokeWidth={3} /> },
   };
   const cfg = statusConfig[section.status];
   return (
-    <div className="rounded-xl border border-gray-200 bg-gray-50/50 overflow-hidden">
-      <button type="button" onClick={onToggle} className="flex w-full items-center gap-4 px-5 py-4 text-left hover:bg-gray-100 transition-colors">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white shadow-sm">
+    <div className="rounded-xl border border-gray-100 bg-[#f8fafc] overflow-hidden transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 hover:border-green-200 hover:bg-white">
+      <button type="button" onClick={onToggle} className="flex w-full items-center gap-4 px-5 py-4 text-left transition-colors">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-green-50">
           {section.icon}
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-gray-800">{section.title}</p>
-          <p className="text-xs text-gray-500 mt-0.5">{section.sub}</p>
+          <p className="text-sm font-bold text-gray-800">{section.title}</p>
+          <p className="text-[13px] text-gray-500 mt-0.5">{section.sub}</p>
         </div>
-        <div className="flex items-center gap-3 shrink-0">
-          <span className={`flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-semibold ${cfg.bg} ${cfg.text}`}>
+        <div className="flex items-center gap-4 shrink-0">
+          <span className={`flex items-center gap-1.5 rounded-md px-3 py-1 text-xs font-semibold ${cfg.bg} ${cfg.text}`}>
             {cfg.icon} {cfg.label}
           </span>
-          <ChevronDown size={18} className={`text-gray-400 transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`} />
+          <ChevronDown size={20} className={`text-gray-400 transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`} />
         </div>
       </button>
       <div className={`grid transition-all duration-300 ease-in-out ${expanded ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
         <div className="overflow-hidden">
-          <div className="border-t border-gray-200 bg-white px-5 py-4">
-            <div className="flex items-center justify-between gap-4">
-              <p className="text-sm text-gray-600">
-                {section.status === 'complete'
-                  ? 'This section has been successfully completed. All required information is captured.'
-                  : 'This information has been verified. You may edit the section details if necessary.'}
-              </p>
-              {section.status !== 'complete' && (
-                <button onClick={() => goToStep(section.goStep)} className="flex shrink-0 items-center gap-1.5 text-sm font-semibold text-[#16A34A] hover:underline">
-                  <Edit2 size={13} /> Edit Section
-                </button>
-              )}
-            </div>
+          <div className="border-t border-gray-200 px-5 py-4 bg-[#f8fafc]">
+            <p className="text-sm text-gray-600">
+              {section.status === 'complete'
+                ? 'This section has been successfully completed. All required information is captured.'
+                : 'This information has been verified. You may edit the section details if necessary.'}
+            </p>
           </div>
         </div>
+      </div>
+    </div>
+  );
+}
+
+function ReviewHeader() {
+  return (
+    <div className="flex items-center gap-4 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm hover:shadow-lg hover:-translate-y-1 hover:border-[#16A34A]/50 transition-all duration-300">
+      <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[#16A34A] shadow-sm relative overflow-hidden">
+        <div className="absolute inset-0 bg-white/20 animate-pulse" />
+        <Check size={26} className="text-white relative z-10 animate-[bounce_2s_infinite]" strokeWidth={3} />
+      </div>
+      <div className="flex flex-col gap-1.5">
+        <div className="flex items-center gap-3">
+          <h2 className="text-xl font-bold text-[#1f2937]">Review Application</h2>
+          <span className="flex items-center gap-1 rounded-md border border-green-200 bg-green-50 px-2 py-0.5 text-[11px] font-bold text-[#16A34A]">
+            <Check size={12} strokeWidth={3} /> Verified via Fayda
+          </span>
+        </div>
+        <p className="text-sm text-gray-500">
+          Please review all information before final submission. Resolve any warnings or missing info.
+        </p>
       </div>
     </div>
   );
@@ -864,23 +965,31 @@ function StepReviewApplication({ form, goToStep }: { form: FormState, goToStep: 
   const [acknowledged, setAcknowledged] = useState(false);
   return (
     <div className="flex flex-col gap-5">
-      <div className="rounded-2xl border border-gray-200 bg-white px-4 py-6 shadow-sm sm:px-6">
-        <h2 className="mb-6 text-base font-semibold text-gray-800">Review Application</h2>
+      <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+        <h2 className="text-lg font-bold text-gray-900 mb-4">Review Application</h2>
+        <hr className="border-gray-100 mb-6" />
+
         <div className="flex flex-col gap-4">
           {REVIEW_SECTIONS.map(section => (
             <ReviewSection key={section.key} section={section} expanded={!!expanded[section.key]} onToggle={() => setExpanded(p => ({ ...p, [section.key]: !p[section.key] }))} goToStep={goToStep} />
           ))}
         </div>
-        <div className="mt-6 pt-6 border-t border-gray-100">
+
+        <hr className="border-gray-100 my-6" />
+
+        <div className="flex items-center justify-between">
           <label className="flex cursor-pointer items-start gap-3" onClick={() => setAcknowledged(v => !v)}>
-            <div className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded border-2 transition-colors ${acknowledged ? 'border-[#16A34A] bg-[#16A34A]' : 'border-gray-300 bg-white'}`}>
-              {acknowledged && <Check size={12} className="text-white" strokeWidth={3} />}
+            <div className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded border transition-colors ${acknowledged ? 'border-[#16A34A] bg-[#16A34A]' : 'border-gray-400 bg-white'}`}>
+              {acknowledged && <Check size={14} className="text-white" strokeWidth={3} />}
             </div>
             <span className={`text-sm transition-colors ${acknowledged ? 'text-gray-900' : 'text-gray-600'}`}>
               I acknowledge that the information provided is true and correct to the best of my knowledge.
             </span>
-            <span className="ml-auto text-sm font-semibold text-[#16A34A] hover:underline whitespace-nowrap"></span>
           </label>
+
+          <button onClick={() => goToStep(1)} className="flex items-center gap-1.5 text-sm font-semibold text-[#16A34A] hover:underline shrink-0">
+            <Edit2 size={16} /> Edit Section
+          </button>
         </div>
       </div>
     </div>
@@ -989,54 +1098,59 @@ function StepSubmitted({ form, submittedAt, appId }: { form: FormState, submitte
       <div className="flex flex-col gap-5">
         <div className="flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
           <div className="relative flex flex-col items-center gap-4 overflow-hidden bg-[#16A34A] px-6 py-12 text-center">
-            <div className="absolute -left-16 -top-16 h-64 w-64 rounded-full bg-white/10" />
-            <div className="absolute -right-16 -bottom-16 h-48 w-48 rounded-full bg-white/10" />
-            <div className="relative flex h-20 w-20 items-center justify-center rounded-full bg-white/20 ring-8 ring-[#10883c]">
-              <Check size={36} className="text-white" strokeWidth={3} />
+            <div className="absolute -left-16 -top-16 h-64 w-64 rounded-full bg-white/10 animate-pulse" />
+            <div className="absolute -right-16 -bottom-16 h-48 w-48 rounded-full bg-white/10 animate-pulse" style={{ animationDelay: '1s' }} />
+
+            <div className="relative flex h-20 w-20 items-center justify-center mb-2">
+              <div className="absolute inset-0 rounded-full bg-white/30 animate-ping opacity-75"></div>
+              <div className="relative flex h-full w-full items-center justify-center rounded-full bg-[#10883c] ring-8 ring-white/20 shadow-xl">
+                <Check size={36} className="text-white" strokeWidth={4} />
+              </div>
             </div>
+
             <div className="relative z-10 mt-2">
               <h2 className="text-2xl font-bold text-white">Application Submitted Successfully!</h2>
               <p className="mt-2 text-sm text-white/90">
                 The loan application for <span className="font-bold text-white">{farmerName}</span> has been securely transmitted to Coop Bank for review.
               </p>
             </div>
-            <span className="relative z-10 mt-2 flex items-center gap-1.5 rounded-full bg-white/20 px-4 py-1.5 text-xs font-semibold text-white">
+            <span className="relative z-10 mt-2 flex items-center gap-1.5 rounded-full bg-[#10883c] px-4 py-1.5 text-xs font-semibold text-white shadow-sm">
               <Check size={12} strokeWidth={3} /> Verified & Submitted
             </span>
           </div>
-          <div className="grid grid-cols-1 gap-4 px-6 py-6 sm:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 px-6 py-8 sm:grid-cols-3 bg-gray-50/30">
             {[
-              { label: 'Application ID', value: displayId, icon: <FileText size={16} className="text-[#16A34A]" /> },
-              { label: 'Submitted On', value: `${dateStr} ${timeStr}`, icon: <Calendar size={16} className="text-[#16A34A]" /> },
-              { label: 'Transfer Method', value: 'SFTP Sync', icon: <Send size={16} className="text-[#16A34A]" /> },
+              { label: 'Application ID', value: displayId, icon: <FileText size={18} className="text-[#16A34A]" /> },
+              { label: 'Submitted On', value: `${dateStr} ${timeStr}`, icon: <Calendar size={18} className="text-[#16A34A]" /> },
+              { label: 'Transfer Method', value: 'SFTP Sync', icon: <Send size={18} className="text-[#16A34A]" /> },
             ].map(({ label, value, icon }) => (
-              <div key={label} className="flex items-center gap-4 rounded-xl border border-gray-100 bg-gray-50 p-4">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gray-200/50">{icon}</div>
+              <div key={label} className="group flex items-center gap-4 rounded-2xl border border-gray-100 bg-white p-5 shadow-sm hover:shadow-md hover:border-green-100 transition-all cursor-default">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gray-50 group-hover:bg-green-50 transition-colors">{icon}</div>
                 <div className="min-w-0">
                   <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500">{label}</p>
-                  <p className="mt-0.5 truncate text-sm font-bold text-gray-900">{value}</p>
+                  <p className="mt-1 truncate text-sm font-bold text-gray-900 group-hover:text-[#16A34A] transition-colors">{value}</p>
                 </div>
               </div>
             ))}
           </div>
-          <div className="mx-6 mb-6 flex items-center gap-4 rounded-xl border border-gray-200 bg-gray-50 px-5 py-4">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gray-200 text-xl text-gray-500"><User size={24} /></div>
+          <div className="mx-6 mb-8 flex items-center gap-4 rounded-2xl border border-gray-100 bg-white px-5 py-4 shadow-sm hover:shadow-md transition-all">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gray-100 text-xl text-gray-500"><User size={24} /></div>
             <div className="flex-1 min-w-0">
               <p className="text-base font-bold text-gray-900">{farmerName}</p>
-              <p className="text-xs text-gray-500">{form.loanType} Loan · {form.loanDuration}</p>
+              <p className="mt-0.5 text-xs text-gray-500">{form.loanType} Loan · {form.loanDuration}</p>
             </div>
-            <span className="flex shrink-0 items-center gap-1.5 rounded-full bg-green-100 px-3 py-1.5 text-xs font-bold text-[#16A34A]">
+            <span className="flex shrink-0 items-center gap-1.5 rounded-full bg-red-50 border border-red-100 px-3 py-1.5 text-xs font-bold text-[#b91c1c]">
               <Check size={12} strokeWidth={3} /> Pending Review
             </span>
           </div>
-          <div className="flex flex-wrap items-center justify-center gap-4 border-t border-gray-100 px-6 py-5 bg-gray-50/50">
-            <button className="flex items-center gap-2 rounded-xl border border-gray-300 bg-white px-5 py-3 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 transition-colors">
+          <div className="flex flex-wrap items-center justify-center gap-4 border-t border-gray-200 px-6 py-6 bg-white">
+            <button onClick={() => window.print()} className="flex items-center gap-2 rounded-xl border border-gray-300 bg-white px-5 py-3 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 transition-colors">
               <Download size={16} /> Download PDF
             </button>
             <button onClick={() => setShowSummary(true)} className="flex items-center gap-2 rounded-xl border border-[#16A34A] bg-white px-5 py-3 text-sm font-semibold text-[#16A34A] shadow-sm hover:bg-[#16A34A]/5 transition-colors">
               View Summary
             </button>
-            <button onClick={() => router.push('/loans/loan-application-dashboard')} className="flex items-center gap-2 rounded-xl bg-[#16A34A] px-6 py-3 text-sm font-bold text-white shadow-sm hover:bg-[#10883c] transition-colors">
+            <button onClick={() => router.push('/leads-dashboard')} className="flex items-center gap-2 rounded-xl bg-[#16A34A] px-6 py-3 text-sm font-bold text-white shadow-sm hover:bg-[#10883c] transition-colors">
               <LayoutDashboard size={16} /> Return to Dashboard
             </button>
           </div>
@@ -1053,6 +1167,15 @@ export default function NewLoanApplication() {
   const [stepUploads, setStepUploads] = useState({});
   const [submittedAt, setSubmittedAt] = useState<string>('');
   const [appId, setAppId] = useState<string>('');
+  const [isSavingDraft, setIsSavingDraft] = useState(false);
+
+  const handleSaveDraft = () => {
+    setIsSavingDraft(true);
+    setTimeout(() => {
+      setIsSavingDraft(false);
+      alert('Draft saved successfully!');
+    }, 800);
+  };
 
   const [form, setForm] = useState<FormState>({
     fullName: 'Amit', lastName: 'Sharma', mobilePhone: '+251 9876543210', dateOfBirth: '1990-05-15', gender: 'Male',
@@ -1092,14 +1215,14 @@ export default function NewLoanApplication() {
 
   return (
     <div className="flex flex-col gap-5 pb-8 w-full px-[4px]">
-      {!isLastStep && (
+      {!isLastStep && currentStep > 1 && (
         <button onClick={goBack} className="flex w-fit items-center gap-1.5 text-sm font-semibold text-gray-600 hover:text-gray-900 transition-colors">
           <ArrowLeft size={16} /> Back
         </button>
       )}
 
       {!isLastStep && (
-        <div className="flex flex-col gap-4 rounded-2xl border border-gray-200 bg-white px-5 py-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-4 rounded-2xl border border-gray-200 bg-white px-5 py-5 shadow-sm hover:shadow-lg hover:-translate-y-1 hover:border-[#16A34A]/50 transition-all duration-300 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-4">
             <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-base font-bold text-white ${isLastStep ? 'bg-[#16A34A]' : 'bg-[#4B5563]'}`}>
               {currentStep}
@@ -1117,13 +1240,15 @@ export default function NewLoanApplication() {
             </div>
           </div>
           <div className="flex items-center gap-3 self-end sm:self-auto">
-            <button onClick={() => router.push('/loans/new-loan-application')} className="rounded-xl border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors shadow-sm">Cancel</button>
-            <button className="rounded-xl border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors shadow-sm">Save Draft</button>
+            <button onClick={() => router.push('/leads-dashboard')} className="rounded-xl border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors shadow-sm">Cancel</button>
+            <button onClick={handleSaveDraft} disabled={isSavingDraft} className="rounded-xl border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors shadow-sm disabled:opacity-70 disabled:cursor-not-allowed">
+              {isSavingDraft ? 'Saving...' : 'Save Draft'}
+            </button>
           </div>
         </div>
       )}
 
-      {!isLastStep && <StepProgressBar currentStep={currentStep} />}
+      <StepProgressBar currentStep={currentStep} />
 
       {currentStep === 1 && <StepConsentAndDocs form={form} setField={setField} uploads={stepUploads} setUploads={setStepUploads} />}
       {currentStep === 2 && <StepFarmerDetails form={form} setField={setField} errors={errors} />}
@@ -1131,17 +1256,17 @@ export default function NewLoanApplication() {
       {currentStep === 4 && <StepSubmitted form={form} submittedAt={submittedAt} appId={appId} />}
 
       {!isLastStep && (
-        <div className="flex flex-col gap-4 rounded-2xl border border-gray-200 bg-white px-5 py-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-4 rounded-2xl border border-gray-200 bg-white px-5 py-5 shadow-sm hover:shadow-lg hover:-translate-y-1 hover:border-[#16A34A]/50 transition-all duration-300 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-4">
-            <button className="rounded-xl border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold text-[#1e3a8a] shadow-sm hover:bg-gray-50 transition-colors">
-              Save Draft
+            <button onClick={handleSaveDraft} disabled={isSavingDraft} className="rounded-xl border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold text-[#1e3a8a] shadow-sm hover:bg-gray-50 transition-colors disabled:opacity-70 disabled:cursor-not-allowed">
+              {isSavingDraft ? 'Saving...' : 'Save Draft'}
             </button>
             <span className="flex items-center gap-1.5 text-sm font-medium text-[#1e3a8a]">
               <Check size={16} className="text-[#1e3a8a]" strokeWidth={2.5} /> Auto-saved
             </span>
           </div>
           <div className="flex w-full items-center justify-between gap-3 sm:w-auto sm:justify-start">
-            {currentStep > 2 && (
+            {currentStep > 1 && (
               <button onClick={goBack} className="flex items-center gap-2 rounded-xl border border-gray-300 bg-white px-5 py-3 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 transition-colors">
                 <ArrowLeft size={14} /> Previous Step
               </button>
