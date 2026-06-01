@@ -338,8 +338,22 @@ function FormSectionCard({ title, children }: { title: string, children: ReactNo
 }
 
 function StepProgressBar({ currentStep }: { currentStep: number }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (containerRef.current) {
+      const container = containerRef.current;
+      const inner = container.children[0] as HTMLElement;
+      if (inner && inner.children[currentStep - 1]) {
+        const activeStepEl = inner.children[currentStep - 1] as HTMLElement;
+        const scrollLeft = activeStepEl.offsetLeft - (container.clientWidth / 2) + (activeStepEl.clientWidth / 2);
+        container.scrollTo({ left: scrollLeft, behavior: 'smooth' });
+      }
+    }
+  }, [currentStep]);
+
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white px-4 py-4 shadow-sm hover:shadow-lg hover:-translate-y-1 hover:border-[#16A34A]/50 transition-all duration-300 sm:px-6 overflow-x-auto">
+    <div ref={containerRef} className="rounded-2xl border border-gray-200 bg-white px-4 py-4 shadow-sm hover:shadow-lg hover:-translate-y-1 hover:border-[#16A34A]/50 transition-all duration-300 sm:px-6 overflow-x-auto">
       <div className="flex items-start gap-0 min-w-[720px] md:min-w-0">
         {STEPS.map(step => {
           const isDone = step.number < currentStep;
@@ -458,6 +472,15 @@ function StepConsentAndDocs({ form, setField, uploads, setUploads }: Step5Props)
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const otpInputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const [otpStatus, setOtpStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [farmerIdSearch, setFarmerIdSearch] = useState('');
+  const [isFarmerFound, setIsFarmerFound] = useState(false);
+
+  const handleFarmerSearch = () => {
+    if (farmerIdSearch.trim()) {
+      setIsFarmerFound(true);
+    }
+  };
+
 
   const handleVerifyOtp = () => {
     const enteredOtp = otp.join('');
@@ -523,10 +546,32 @@ function StepConsentAndDocs({ form, setField, uploads, setUploads }: Step5Props)
           <div className="flex flex-col gap-6">
             <div className="flex flex-col gap-1.5">
               <label className="text-sm font-medium text-gray-700">Farmer ID / Fayda ID</label>
-              <div className="flex items-center gap-3">
-                <input type="text" placeholder="Search by Farmer ID or National ID" className="flex-1 rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm shadow-sm placeholder:text-gray-400 focus:border-[#16A34A] focus:outline-none focus:ring-2 focus:ring-[#16A34A]/20" />
-                <button type="button" className="rounded-lg bg-[#16A34A] px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-[#15803d] transition-colors">Search</button>
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                <input
+                  type="text"
+                  placeholder="Search by Farmer ID or National ID"
+                  value={isFarmerFound ? '***********' : farmerIdSearch}
+                  onChange={(e) => setFarmerIdSearch(e.target.value)}
+                  disabled={isFarmerFound}
+                  className={`w-full sm:flex-1 rounded-lg border px-3 py-2.5 text-sm shadow-sm focus:outline-none focus:ring-2 ${isFarmerFound ? 'border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed' : 'border-gray-300 bg-white placeholder:text-gray-400 focus:border-[#16A34A] focus:ring-[#16A34A]/20'}`}
+                />
+                <button
+                  type="button"
+                  onClick={handleFarmerSearch}
+                  disabled={isFarmerFound}
+                  className={`w-full sm:w-auto rounded-lg px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-colors ${isFarmerFound ? 'bg-gray-300 cursor-not-allowed' : 'bg-[#16A34A] hover:bg-[#15803d]'}`}
+                >
+                  Search
+                </button>
               </div>
+              {isFarmerFound && (
+                <div className="mt-1 flex items-center gap-2">
+                  <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#16A34A] text-white">
+                    <Check size={14} strokeWidth={3} />
+                  </div>
+                  <span className="text-sm font-medium text-gray-500">Consent provided on May 25, 2026</span>
+                </div>
+              )}
             </div>
 
             <div>
@@ -895,28 +940,30 @@ function DocUploadCard({ doc, entry, onUpload, onRemove, uploadProgress, showCam
 }
 
 const REVIEW_SECTIONS = [
-  { key: 'consentOtp', icon: <User size={20} className="text-[#16A34A]" />, title: 'Consent & Supporting Documents', sub: "Obtain farmer's consent and upload required documents", status: 'complete', goStep: 1 },
-  { key: 'farmerDetails', icon: <Folder size={20} className="text-[#16A34A]" />, title: 'Farmer Details', sub: 'Capture information about the requested loan and farming activities.', status: 'complete', goStep: 2 },
-  { key: 'supportingDocs', icon: <Shield size={20} className="text-[#16A34A]" />, title: 'Supporting Documents', sub: "Obtain farmer's consent to access registry data via Fayda OTP", status: 'verified', goStep: 1 },
+  { key: 'consentOtp', icon: <User size={20} className="text-[#16A34A]" fill="currentColor" />, title: 'Consent & Supporting Documents', sub: "Obtain farmer's consent and upload required documents", status: 'complete', goStep: 1 },
+  { key: 'farmerDetails', icon: <Folder size={20} className="text-[#16A34A]" fill="currentColor" />, title: 'Farmer Details', sub: 'Capture information about the requested loan and farming activities.', status: 'complete', goStep: 2 },
+  { key: 'supportingDocs', icon: <Shield size={20} className="text-[#16A34A]" fill="currentColor" />, title: 'Supporting Documents', sub: "Obtain farmer's consent to access registry data via Fayda OTP", status: 'verified', goStep: 1 },
 ];
 
 function ReviewSection({ section, expanded, onToggle, goToStep }: { section: any, expanded: boolean, onToggle: () => void, goToStep: (step: number) => void }) {
   const statusConfig: Record<string, any> = {
     complete: { label: 'Complete', bg: 'bg-green-100', text: 'text-green-700', icon: <Check size={14} strokeWidth={3} /> },
-    verified: { label: 'Verified', bg: 'bg-green-100', text: 'text-green-700', icon: <Check size={14} strokeWidth={3} /> },
+    verified: { label: 'Verified', bg: 'bg-red-100', text: 'text-red-700', icon: <Check size={14} strokeWidth={3} /> },
   };
   const cfg = statusConfig[section.status];
   return (
-    <div className="rounded-xl border border-gray-100 bg-[#f8fafc] overflow-hidden transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 hover:border-green-200 hover:bg-white">
-      <button type="button" onClick={onToggle} className="flex w-full items-center gap-4 px-5 py-4 text-left transition-colors">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-green-50">
-          {section.icon}
+    <div className="rounded-xl border border-gray-200 bg-[#f8fafc] overflow-hidden transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 hover:border-green-200 hover:bg-white">
+      <button type="button" onClick={onToggle} className="flex flex-col sm:flex-row w-full sm:items-center gap-3 sm:gap-4 px-5 py-4 text-left transition-colors">
+        <div className="flex items-center gap-4 w-full flex-1 min-w-0">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-green-50">
+            {section.icon}
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-bold text-gray-800">{section.title}</p>
+            <p className="text-[13px] text-gray-500 mt-0.5 sm:truncate sm:max-w-[400px]">{section.sub}</p>
+          </div>
         </div>
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-bold text-gray-800">{section.title}</p>
-          <p className="text-[13px] text-gray-500 mt-0.5">{section.sub}</p>
-        </div>
-        <div className="flex items-center gap-4 shrink-0">
+        <div className="flex items-center justify-between w-full sm:w-auto pl-14 sm:pl-0 shrink-0">
           <span className={`flex items-center gap-1.5 rounded-md px-3 py-1 text-xs font-semibold ${cfg.bg} ${cfg.text}`}>
             {cfg.icon} {cfg.label}
           </span>
@@ -926,7 +973,7 @@ function ReviewSection({ section, expanded, onToggle, goToStep }: { section: any
       <div className={`grid transition-all duration-300 ease-in-out ${expanded ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
         <div className="overflow-hidden">
           <div className="border-t border-gray-200 px-5 py-4 bg-[#f8fafc]">
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-gray-600 text-center">
               {section.status === 'complete'
                 ? 'This section has been successfully completed. All required information is captured.'
                 : 'This information has been verified. You may edit the section details if necessary.'}
@@ -967,7 +1014,7 @@ function StepReviewApplication({ form, goToStep }: { form: FormState, goToStep: 
     <div className="flex flex-col gap-5">
       <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
         <h2 className="text-lg font-bold text-gray-900 mb-4">Review Application</h2>
-        <hr className="border-gray-100 mb-6" />
+        <hr className="border-gray-200 mb-6" />
 
         <div className="flex flex-col gap-4">
           {REVIEW_SECTIONS.map(section => (
@@ -975,7 +1022,7 @@ function StepReviewApplication({ form, goToStep }: { form: FormState, goToStep: 
           ))}
         </div>
 
-        <hr className="border-gray-100 my-6" />
+        <hr className="border-gray-200 my-6" />
 
         <div className="flex items-center justify-between">
           <label className="flex cursor-pointer items-start gap-3" onClick={() => setAcknowledged(v => !v)}>
@@ -987,9 +1034,7 @@ function StepReviewApplication({ form, goToStep }: { form: FormState, goToStep: 
             </span>
           </label>
 
-          <button onClick={() => goToStep(1)} className="flex items-center gap-1.5 text-sm font-semibold text-[#16A34A] hover:underline shrink-0">
-            <Edit2 size={16} /> Edit Section
-          </button>
+
         </div>
       </div>
     </div>
@@ -1030,7 +1075,7 @@ function SummaryModal({ form, displayId, dateStr, timeStr, onClose }: { form: Fo
             <div className="mb-4 flex items-center gap-2">
               <span className="text-lg">👤</span><h3 className="text-sm font-bold text-gray-900">Farmer Information</h3>
             </div>
-            <div className="grid grid-cols-2 gap-x-8 gap-y-6 sm:grid-cols-3">
+            <div className="grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2 md:grid-cols-3">
               <F label="Full Name" value={form.fullName} />
               <F label="Father's Name" value={form.fatherName} />
               <F label="Farmer ID" value={form.farmerId} />
@@ -1049,7 +1094,7 @@ function SummaryModal({ form, displayId, dateStr, timeStr, onClose }: { form: Fo
             <div className="mb-4 flex items-center gap-2">
               <span className="text-lg">🔒</span><h3 className="text-sm font-bold text-gray-900">Loan Details</h3>
             </div>
-            <div className="grid grid-cols-2 gap-x-8 gap-y-6 sm:grid-cols-3">
+            <div className="grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2 md:grid-cols-3">
               <F label="Loan Type" value={form.loanType} />
               <F label="Purpose" value={form.loanPurpose} />
               <F label="Requested Amount" value={form.requestedAmount ? `ETB ${Number(form.requestedAmount).toLocaleString()}` : ''} />
@@ -1064,7 +1109,7 @@ function SummaryModal({ form, displayId, dateStr, timeStr, onClose }: { form: Fo
             <div className="mb-4 flex items-center gap-2">
               <span className="text-lg">🏦</span><h3 className="text-sm font-bold text-gray-900">Banking Information</h3>
             </div>
-            <div className="grid grid-cols-2 gap-x-8 gap-y-6 sm:grid-cols-3">
+            <div className="grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2 md:grid-cols-3">
               <F label="Bank Account No." value={form.bankAccount} />
               <F label="IFSC / FSC Code" value={form.ifscCode} />
               <F label="Bank Name" value={form.bankName} />
@@ -1133,24 +1178,26 @@ function StepSubmitted({ form, submittedAt, appId }: { form: FormState, submitte
               </div>
             ))}
           </div>
-          <div className="mx-6 mb-8 flex items-center gap-4 rounded-2xl border border-gray-100 bg-white px-5 py-4 shadow-sm hover:shadow-md transition-all">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gray-100 text-xl text-gray-500"><User size={24} /></div>
-            <div className="flex-1 min-w-0">
-              <p className="text-base font-bold text-gray-900">{farmerName}</p>
-              <p className="mt-0.5 text-xs text-gray-500">{form.loanType} Loan · {form.loanDuration}</p>
+          <div className="mx-6 mb-8 flex flex-col sm:flex-row items-start sm:items-center gap-4 rounded-2xl border border-gray-100 bg-white px-5 py-4 shadow-sm hover:shadow-md transition-all">
+            <div className="flex items-center gap-4 w-full sm:w-auto">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gray-100 text-xl text-gray-500"><User size={24} /></div>
+              <div className="flex-1 min-w-0 sm:flex-none">
+                <p className="text-base font-bold text-gray-900">{farmerName}</p>
+                <p className="mt-0.5 text-xs text-gray-500">{form.loanType} Loan · {form.loanDuration}</p>
+              </div>
             </div>
-            <span className="flex shrink-0 items-center gap-1.5 rounded-full bg-red-50 border border-red-100 px-3 py-1.5 text-xs font-bold text-[#b91c1c]">
+            <span className="flex shrink-0 items-center gap-1.5 rounded-full bg-red-50 border border-red-100 px-3 py-1.5 text-xs font-bold text-[#b91c1c] sm:ml-auto">
               <Check size={12} strokeWidth={3} /> Pending Review
             </span>
           </div>
-          <div className="flex flex-wrap items-center justify-center gap-4 border-t border-gray-200 px-6 py-6 bg-white">
-            <button onClick={() => window.print()} className="flex items-center gap-2 rounded-xl border border-gray-300 bg-white px-5 py-3 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 transition-colors">
+          <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center justify-center gap-4 border-t border-gray-200 px-6 py-6 bg-white">
+            <button onClick={() => window.print()} className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white px-5 py-3 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 transition-colors">
               <Download size={16} /> Download PDF
             </button>
-            <button onClick={() => setShowSummary(true)} className="flex items-center gap-2 rounded-xl border border-[#16A34A] bg-white px-5 py-3 text-sm font-semibold text-[#16A34A] shadow-sm hover:bg-[#16A34A]/5 transition-colors">
+            <button onClick={() => setShowSummary(true)} className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl border border-[#16A34A] bg-white px-5 py-3 text-sm font-semibold text-[#16A34A] shadow-sm hover:bg-[#16A34A]/5 transition-colors">
               View Summary
             </button>
-            <button onClick={() => router.push('/leads-dashboard')} className="flex items-center gap-2 rounded-xl bg-[#16A34A] px-6 py-3 text-sm font-bold text-white shadow-sm hover:bg-[#10883c] transition-colors">
+            <button onClick={() => router.push('/leads-dashboard')} className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl bg-[#16A34A] px-6 py-3 text-sm font-bold text-white shadow-sm hover:bg-[#10883c] transition-colors">
               <LayoutDashboard size={16} /> Return to Dashboard
             </button>
           </div>
@@ -1239,9 +1286,9 @@ export default function NewLoanApplication() {
               <p className="text-sm text-gray-500 mt-0.5">{STEP_META[currentStep - 1]?.subtitle}</p>
             </div>
           </div>
-          <div className="flex items-center gap-3 self-end sm:self-auto">
-            <button onClick={() => router.push('/leads-dashboard')} className="rounded-xl border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors shadow-sm">Cancel</button>
-            <button onClick={handleSaveDraft} disabled={isSavingDraft} className="rounded-xl border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors shadow-sm disabled:opacity-70 disabled:cursor-not-allowed">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 self-stretch sm:self-auto">
+            <button onClick={() => router.push('/leads-dashboard')} className="w-full sm:w-auto rounded-xl border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors shadow-sm">Cancel</button>
+            <button onClick={handleSaveDraft} disabled={isSavingDraft} className="w-full sm:w-auto rounded-xl border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors shadow-sm disabled:opacity-70 disabled:cursor-not-allowed">
               {isSavingDraft ? 'Saving...' : 'Save Draft'}
             </button>
           </div>
@@ -1257,26 +1304,26 @@ export default function NewLoanApplication() {
 
       {!isLastStep && (
         <div className="flex flex-col gap-4 rounded-2xl border border-gray-200 bg-white px-5 py-5 shadow-sm hover:shadow-lg hover:-translate-y-1 hover:border-[#16A34A]/50 transition-all duration-300 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-4">
-            <button onClick={handleSaveDraft} disabled={isSavingDraft} className="rounded-xl border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold text-[#1e3a8a] shadow-sm hover:bg-gray-50 transition-colors disabled:opacity-70 disabled:cursor-not-allowed">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+            <button onClick={handleSaveDraft} disabled={isSavingDraft} className="w-full sm:w-auto rounded-xl border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold text-[#1e3a8a] shadow-sm hover:bg-gray-50 transition-colors disabled:opacity-70 disabled:cursor-not-allowed">
               {isSavingDraft ? 'Saving...' : 'Save Draft'}
             </button>
-            <span className="flex items-center gap-1.5 text-sm font-medium text-[#1e3a8a]">
+            <span className="flex items-center justify-center sm:justify-start gap-1.5 text-sm font-medium text-[#1e3a8a]">
               <Check size={16} className="text-[#1e3a8a]" strokeWidth={2.5} /> Auto-saved
             </span>
           </div>
-          <div className="flex w-full items-center justify-between gap-3 sm:w-auto sm:justify-start">
+          <div className="flex flex-col sm:flex-row w-full items-stretch sm:items-center justify-between gap-3 sm:w-auto sm:justify-start">
             {currentStep > 1 && (
-              <button onClick={goBack} className="flex items-center gap-2 rounded-xl border border-gray-300 bg-white px-5 py-3 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 transition-colors">
+              <button onClick={goBack} className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white px-5 py-3 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 transition-colors">
                 <ArrowLeft size={14} /> Previous Step
               </button>
             )}
             {isSubmitStep ? (
-              <button onClick={handleSubmit} className="flex items-center gap-2 rounded-xl bg-[#16A34A] px-6 py-3 text-sm font-bold text-white shadow-sm hover:bg-[#10883c] transition-colors">
+              <button onClick={handleSubmit} className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl bg-[#16A34A] px-6 py-3 text-sm font-bold text-white shadow-sm hover:bg-[#10883c] transition-colors">
                 Submit Application <Send size={14} />
               </button>
             ) : (
-              <button onClick={goNext} className="flex items-center gap-2 rounded-xl bg-[#16A34A] px-6 py-3 text-sm font-bold text-white shadow-sm hover:bg-[#10883c] transition-colors">
+              <button onClick={goNext} className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl bg-[#16A34A] px-6 py-3 text-sm font-bold text-white shadow-sm hover:bg-[#10883c] transition-colors">
                 {currentStep === 1 ? 'Confirm & Next' : 'Next Step'} <ArrowRight size={14} />
               </button>
             )}

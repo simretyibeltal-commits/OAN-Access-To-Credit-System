@@ -78,23 +78,44 @@ function Sidebar({ isCollapsed, isMobileOpen = false, sections = [] }: SidebarPr
       {/* ── Brand ────────────────────────────────────────────────────────── */}
       <div
         className={[
-          'flex shrink-0 items-center gap-3 border-b border-white/[0.08]',
-          'px-[0.45rem] pb-4 pt-[0.8rem]',
+          'flex shrink-0 items-center gap-4 border-b border-white/[0.08]',
+          'px-[0.45rem] pb-6 pt-[0.9rem]',
           isCollapsed ? 'min-[900px]:justify-center min-[900px]:gap-0 min-[900px]:px-0' : '',
         ].join(' ')}
       >
-        <div className="grid h-[2.35rem] w-[2.35rem] shrink-0 place-items-center rounded-lg bg-white text-panel shadow-[0_10px_20px_rgba(0,0,0,0.12)]">
-          <ShieldCheck size={18} strokeWidth={2.3} />
+        {/* Left Side: Logo Graphic */}
+        <div className={`flex shrink-0 items-center justify-center ${isCollapsed ? 'w-full' : ''}`}>
+          <img
+            src="/logo.png"
+            alt="OARI Logo"
+            className="h-10 w-auto object-contain hidden"
+            id="primary-logo-img"
+            onLoad={(e) => {
+              e.currentTarget.classList.remove('hidden');
+              const fallback = document.getElementById('fallback-logo-graphic');
+              if (fallback) fallback.classList.add('hidden');
+            }}
+          />
+          {/* Fallback graphic shown by default (hides if image loads) */}
+          <div id="fallback-logo-graphic" className="flex items-center justify-center">
+            <span className="text-[2.2rem] font-extrabold text-[#c4ea48] leading-none" style={{ fontFamily: 'system-ui, sans-serif', letterSpacing: '-0.08em' }}>
+              oari
+            </span>
+          </div>
         </div>
+
+        {/* Right Side: Text */}
         <div
           className={[
-            'flex min-w-0 flex-col gap-[0.15rem]',
-            isCollapsed ? 'min-[900px]:hidden' : '',
+            'flex min-w-0 flex-col justify-center gap-[0.15rem]',
+            isCollapsed ? 'min-[900px]:hidden' : 'flex',
           ].join(' ')}
         >
-          <span className="text-base font-bold tracking-[-0.03em]">Open AgriNet</span>
-          <span className="text-[0.6rem] font-bold uppercase tracking-[0.18em] text-white/[0.68]">
-            Access Credit System
+          <span className="text-[1.05rem] font-bold text-white leading-tight tracking-tight">
+            Ethiopia OpenAgriNet
+          </span>
+          <span className="text-[0.85rem] text-[#e2e8f0] tracking-wide leading-tight font-medium">
+            Access to Credit
           </span>
         </div>
       </div>
