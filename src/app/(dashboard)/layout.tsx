@@ -2,48 +2,37 @@
 
 import React, { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { useQueryClient } from '@tanstack/react-query';
-import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { Clock3, FileText, ListChecks, Plus, SquarePen, Users } from 'lucide-react';
+import { useAppDispatch, useAppSelector } from '@/store/hooks'
+import { ListChecks, Users } from 'lucide-react';
 import Sidebar from '@/components/Sidebar';
 import TopHeader from '@/components/TopHeader';
 import { selectIsAuthenticated, logout as logoutAction } from '@/features/auth/store/authSlice';
-import '@/styles/main-layout.scss';
 
+import '@/assets/styles/main-layout.scss';
 const navigationSections = [
   {
     title: 'DASHBOARDS',
     items: [
       { path: '/leads-dashboard', label: 'Leads Dashboard', icon: Users },
-      // { path: '/loan-application-dashboard', label: 'Loan Application Dashboard', icon: FileText },
     ],
   },
   {
     title: 'WORKFLOW',
     items: [
       {
-        path: '/new-lead-creation',
-        activePaths: ['/new-lead-creation'],
-        label: 'New Lead Creation',
-        icon: Plus,
-      },
-      {
-        path: '/loans/new-loan-application-creation',
-        activePaths: ['/loans/new-loan-application-creation'],
-        label: 'New Loan Application Creation',
+        path: '/loans/new-loan-application',
+        activePaths: ['/loans/new-loan-application'],
+        label: 'New Loan Application',
         icon: ListChecks,
       },
-      {
-        path: '/loans/create-new-credit-request',
-        label: 'Create New Credit Request',
-        icon: SquarePen,
-      },
-      { path: '/loans/update-loan-application-status', label: 'Update Loan Application Status', icon: Clock3 },
     ],
   },
 ];
 
-
+const PAGE_TITLES: Record<string, string> = {
+  '/leads-dashboard': 'Leads Dashboard',
+  '/loans/new-loan-application': 'New Loan Application',
+};
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -51,7 +40,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const pathname = usePathname();
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const queryClient = useQueryClient();
 
   const isAuthenticated = useAppSelector(selectIsAuthenticated);
 
@@ -100,7 +88,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           onLogout={async () => {
             await fetch('/api/auth/logout', { method: 'POST' }).catch(() => { });
             dispatch(logoutAction());
-            queryClient.clear();
             router.push('/login');
           }}
           pageTitle={pageTitle}
