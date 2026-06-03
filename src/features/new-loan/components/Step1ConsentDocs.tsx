@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { nextStep } from '@/features/new-loan/store/newLoanFormSlice';
-import { ArrowRight, CheckCircle2, FileText, Loader2, FolderOpen, Eye, EyeOff, X, Check, ChevronDown } from 'lucide-react';
+import { ArrowRight, CheckCircle2, FileText, Loader2, FolderOpen, Eye, EyeOff, X, Check, ChevronDown, Info } from 'lucide-react';
 import type { AppDispatch } from '@/store';
 
 export function Step1ConsentDocs() {
@@ -319,16 +319,17 @@ export function Step1ConsentDocs() {
                 </button>
                 <span className='font-normal'>provided on May 25, 2026</span>
               </div>
+              <div className="flex items-start gap-3 rounded-xl border border-blue-100 bg-[#f4f8ff] p-4">
+                <Info className="mt-0.5 shrink-0 text-blue-500" size={18} />
+                <div>
+                  <p className="text-sm font-semibold text-[#2563eb]">Consent Authorization</p>
+                  <p className="mt-1 text-xs text-blue-700/80 leading-relaxed">By requesting OTP, you confirm the farmer is present and has verbally agreed to share their registry data with AgriBank.</p>
+                </div>
+              </div>
             </div>
 
-            <div className="flex items-start gap-3 rounded-xl border border-blue-100 bg-[#f4f8ff] p-4">
-              <Info className="mt-0.5 shrink-0 text-blue-500" size={18} />
-              <div>
-                <p className="text-sm font-semibold text-[#2563eb]">Consent Authorization</p>
-                <p className="mt-1 text-xs text-blue-700/80 leading-relaxed">By requesting OTP, you confirm the farmer is present and has verbally agreed to share their registry data with AgriBank.</p>
-
-                {/* Right Column - Signed Consent Form */}
-                <div className="rounded-lg border border-gray-200 bg-white p-5">
+            {/* Right Column - Signed Consent Form */}
+            <div className="rounded-lg border border-gray-200 bg-white p-5">
                   <div className="mb-4 flex items-start justify-between">
                     <div>
                       <h3 className="text-[15px] font-semibold text-gray-900">Signed Consent Form</h3>
