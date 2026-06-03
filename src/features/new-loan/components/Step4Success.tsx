@@ -1,46 +1,48 @@
 import React, { useState } from 'react';
 import { User, FileText, Calendar, Download, LayoutDashboard, Check, X, Lock, Building } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useDispatch } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { resetForm, setStep } from '@/features/new-loan/store/newLoanFormSlice';
-
-const newLoanApplicationData = {
-  farmerInformation: [
-    { label: "Full Name", value: "—" },
-    { label: "Father's Name", value: "—" },
-    { label: "Farmer ID", value: "FR - 1234567890" },
-    { label: "Date of Birth", value: "—" },
-    { label: "Gender", value: "—" },
-    { label: "Marital Status", value: "—" },
-    { label: "Mobile Phone", value: "—" },
-    { label: "Education Level", value: "—" },
-    { label: "National ID", value: "—" },
-    { label: "Region", value: "Oromia" },
-    { label: "Woreda", value: "Bishoftu" },
-    { label: "Kebele", value: "—" },
-  ],
-  loanDetails: [
-    { label: "Loan Type", value: "input" },
-    { label: "Purpose", value: "Agro-processing (e.g., milling grain)" },
-    { label: "Requested Amount", value: "—" },
-    { label: "Duration", value: "12 Months (1 Year)" },
-    { label: "Primary Crops", value: "Teff" },
-    { label: "Crop Variety", value: "Seed + S-Hela/Acherr + Stellar Star" },
-    { label: "Land Size", value: "—" },
-    { label: "Expected Yield", value: "—" },
-  ],
-  bankingInformation: [
-    { label: "Bank Account No.", value: "—" },
-    { label: "IFSC / FSC Code", value: "—" },
-    { label: "Bank Name", value: "—" },
-    { label: "Account Holder", value: "—" },
-  ]
-};
+import type { RootState } from '@/store';
 
 export function Step4Success() {
   const router = useRouter();
   const dispatch = useDispatch();
   const [showSummaryPopup, setShowSummaryPopup] = useState(false);
+  const formData = useSelector((state: RootState) => state.loanForm.formData);
+
+  const newLoanApplicationData = {
+    farmerInformation: [
+      { label: "Full Name", value: formData.firstName && formData.lastName ? `${formData.firstName} ${formData.lastName}` : "—" },
+      { label: "Father's Name", value: formData.fatherName || "—" },
+      { label: "Farmer ID", value: formData.farmId || "FR - 1234567890" },
+      { label: "Date of Birth", value: formData.dateOfBirth || "—" },
+      { label: "Gender", value: formData.gender || "—" },
+      { label: "Marital Status", value: formData.maritalStatus || "—" },
+      { label: "Mobile Phone", value: formData.mobilePhone || "—" },
+      { label: "Education Level", value: formData.educationLevel || "—" },
+      { label: "National ID", value: formData.idNumber || "—" },
+      { label: "Region", value: formData.region || "Oromia" },
+      { label: "Woreda", value: formData.woreda || "Bishoftu" },
+      { label: "Kebele", value: formData.kebele || "—" },
+    ],
+    loanDetails: [
+      { label: "Loan Type", value: formData.loanType || "input" },
+      { label: "Purpose", value: formData.purpose || "Agro-processing (e.g., milling grain)" },
+      { label: "Requested Amount", value: formData.requestedAmount || "—" },
+      { label: "Duration", value: formData.duration || "12 Months (1 Year)" },
+      { label: "Primary Crops", value: formData.primaryCrop || "Teff" },
+      { label: "Crop Variety", value: formData.cropVariety || "Seed + S-Hela/Acherr + Stellar Star" },
+      { label: "Land Size", value: formData.landSize || "—" },
+      { label: "Expected Yield", value: formData.expectedYield || "—" },
+    ],
+    bankingInformation: [
+      { label: "Bank Account No.", value: formData.accountNumber || "—" },
+      { label: "IFSC / FSC Code", value: formData.ifscCode || "—" },
+      { label: "Bank Name", value: formData.bankName || "—" },
+      { label: "Account Holder", value: formData.accountName || "—" },
+    ]
+  };
 
   const handleReturnToDashboard = () => {
     dispatch(resetForm());
@@ -134,7 +136,7 @@ export function Step4Success() {
     </div>
 
       {showSummaryPopup && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-[999] flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="w-full max-w-2xl rounded-xl bg-white shadow-2xl animate-in zoom-in-95 duration-200 flex flex-col max-h-[95vh] overflow-hidden">
             {/* Header */}
             <div className="bg-[#2E7250] px-6 py-5 flex items-start justify-between shrink-0 rounded-t-xl">

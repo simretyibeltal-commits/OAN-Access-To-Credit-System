@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { prevStep, setStep } from '@/features/new-loan/store/newLoanFormSlice';
-import { ArrowLeft, Send, Check, User, Folder, ChevronDown, Loader2 } from 'lucide-react';
+import { ArrowLeft, Send, Check, User, Folder, ChevronDown, Loader2, AlertCircle } from 'lucide-react';
 import type { AppDispatch } from '@/store';
 import { useRouter } from 'next/navigation';
 
@@ -13,6 +13,7 @@ export function Step3ReviewSubmit() {
   const [isSavingDraft, setIsSavingDraft] = useState(false);
   const [lastSaved, setLastSaved] = useState<string | null>(null);
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
+  const [showValidationPopup, setShowValidationPopup] = useState(false);
 
   // Background auto-save simulation
   useEffect(() => {
@@ -35,7 +36,7 @@ export function Step3ReviewSubmit() {
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!acknowledged) {
-      alert("Please acknowledge the information is correct.");
+      setShowValidationPopup(true);
       return;
     }
     // Application submitted successfully
@@ -151,6 +152,27 @@ export function Step3ReviewSubmit() {
           </button>
         </div>
       </div>
+      {/* Validation Popup */}
+      {showValidationPopup && (
+        <div className="fixed inset-0 z-[999] flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="w-full max-w-md rounded-2xl bg-white shadow-2xl animate-in zoom-in-95 duration-200 overflow-hidden text-center p-8">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-red-100 mb-6">
+              <AlertCircle className="h-8 w-8 text-red-600" strokeWidth={2} />
+            </div>
+            <h3 className="text-xl font-bold text-gray-900 mb-3">Acknowledgment Required</h3>
+            <p className="text-[15px] text-gray-600 mb-8">
+              Please check the box to acknowledge that the information provided is correct before submitting the application.
+            </p>
+            <button
+              type="button"
+              onClick={() => setShowValidationPopup(false)}
+              className="w-full rounded-xl bg-[#16A34A] py-3.5 text-[15px] font-bold text-white shadow-sm hover:bg-[#15803d] transition-colors"
+            >
+              Got it
+            </button>
+          </div>
+        </div>
+      )}
     </form>
   );
 }

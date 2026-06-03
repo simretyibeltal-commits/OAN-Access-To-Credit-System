@@ -170,14 +170,13 @@ function TopHeader({ isSidebarCollapsed, onToggleSidebar, onLogout, pageTitle = 
         >
           {pageTitle}
         </button>
-        <span className="flex items-center gap-1.5 rounded-md border border-green-200 bg-[#f0fdf4] px-2 py-0.5 text-xs font-bold text-[#16A34A]">
-
+        <span className="flex items-center gap-1.5 rounded-md border border-green-200 bg-[#f0fdf4] px-2 py-0.5 text-xs font-bold text-[#16A34A] whitespace-nowrap shrink-0">
           LD-9822
         </span>
       </div>
 
       {/* Right: actions */}
-      <div className="flex items-center gap-[0.7rem] flex-wrap justify-end max-[640px]:gap-[0.45rem]">
+      <div className="flex items-center gap-[0.7rem] justify-end max-[640px]:gap-[0.45rem] shrink-0">
 
         {/* Notifications */}
         <div className="relative inline-flex" ref={notificationsRef}>
@@ -250,9 +249,8 @@ function TopHeader({ isSidebarCollapsed, onToggleSidebar, onLogout, pageTitle = 
           </div>
         </div>
 
-        {/* Language selector */}
-        {/* Language selector toggle */}
-        <div className="relative inline-flex items-center p-[0.2rem] rounded-[1.5rem] border border-gray-200 bg-white shadow-sm">
+        {/* Language selector (Hidden on mobile, moved to profile dropdown) */}
+        <div className="hidden sm:inline-flex relative items-center p-[0.2rem] rounded-[1.5rem] border border-gray-200 bg-white shadow-sm">
           <button
             type="button"
             onClick={() => setSelectedLanguage('EN')}
@@ -286,8 +284,8 @@ function TopHeader({ isSidebarCollapsed, onToggleSidebar, onLogout, pageTitle = 
             aria-expanded={isProfileMenuOpen}
             onClick={() => setIsProfileMenuOpen((v) => !v)}
             className={[
-              'group inline-flex items-center gap-2.5',
-              'rounded-[1.1rem] py-2 pl-1 pr-3.5',
+              'group inline-flex items-center gap-2 sm:gap-2.5',
+              'rounded-[1.5rem] py-1 pl-1 pr-2.5 sm:py-2 sm:pl-1 sm:pr-3.5',
               'bg-white border border-gray-200',
               'shadow-[0_2px_8px_rgba(0,0,0,0.04)]',
               'transition-all duration-300 ease-out',
@@ -316,8 +314,8 @@ function TopHeader({ isSidebarCollapsed, onToggleSidebar, onLogout, pageTitle = 
               </div>
             </div>
 
-            {/* Name & role */}
-            <div className="flex flex-col items-start min-w-0 pr-1">
+            {/* Name & role (Hidden on mobile) */}
+            <div className="hidden sm:flex flex-col items-start min-w-0 pr-1">
               <span className="text-[0.9rem] font-bold text-gray-900 leading-tight tracking-tight">{officerName}</span>
               <span className="text-[0.75rem] text-gray-500 font-medium leading-tight">ID: {officerRole}</span>
             </div>
@@ -335,7 +333,7 @@ function TopHeader({ isSidebarCollapsed, onToggleSidebar, onLogout, pageTitle = 
             aria-label="User profile actions"
             className={[
               'absolute right-0 top-[calc(100%+0.5rem)] z-20 overflow-hidden',
-              'w-[11.5rem]',
+              'w-[13.5rem]',
               'rounded-xl border border-gray-100 bg-white',
               'shadow-[0_10px_25px_rgba(0,0,0,0.1)] [transform-origin:top_right]',
               'transition-[opacity,transform,visibility] duration-200',
@@ -344,6 +342,33 @@ function TopHeader({ isSidebarCollapsed, onToggleSidebar, onLogout, pageTitle = 
                 : 'opacity-0 pointer-events-none scale-[0.96] -translate-y-[0.5rem] invisible',
             ].join(' ')}
           >
+            <div className="sm:hidden px-4 py-3 border-b border-gray-100 bg-gray-50/50 flex items-center gap-3">
+              <div className="h-9 w-9 rounded-full bg-[#10b981] flex items-center justify-center font-bold text-white shrink-0">
+                {initials}
+              </div>
+              <div className="min-w-0">
+                <span className="block text-[0.9rem] font-bold text-gray-900 truncate">{officerName}</span>
+                <span className="block text-[0.75rem] text-gray-500 font-medium truncate">ID: {officerRole}</span>
+              </div>
+            </div>
+
+            <div className="sm:hidden px-4 py-3 border-b border-gray-100 flex items-center justify-between">
+              {/* <span className="text-[0.8rem] font-bold text-gray-700">Language</span> */}
+              <div className="flex items-center gap-1 rounded-full w-full border border-gray-200 p-0.5 bg-gray-50">
+                <button
+                  onClick={() => setSelectedLanguage('EN')}
+                  className={`px-2 py-1 text-[0.7rem] w-1/2 font-bold rounded-full transition-colors ${selectedLanguage === 'EN' ? 'bg-[#fbbf24] text-[#1e293b]' : 'text-gray-500'}`}
+                >
+                  EN
+                </button>
+                <button
+                  onClick={() => setSelectedLanguage('AM')}
+                  className={`px-2 py-1 text-[0.7rem] w-1/2 font-bold rounded-full transition-colors ${selectedLanguage === 'AM' ? 'bg-[#fbbf24] text-[#1e293b]' : 'text-[#14532d]'}`}
+                >
+                  አማ
+                </button>
+              </div>
+            </div>
             <div className="flex flex-col py-1.5">
               <button
                 onClick={closeProfileMenu}

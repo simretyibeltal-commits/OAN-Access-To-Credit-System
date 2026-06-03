@@ -137,9 +137,9 @@ export function Step1ConsentDocs() {
   return (
     <>
       {showAddDocPopup && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-[999] flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="w-full max-w-lg rounded-xl bg-white shadow-2xl animate-in zoom-in-95 duration-200 flex flex-col max-h-[95vh]">
-            <div className="flex items-center justify-between border-b border-gray-100 px-4 sm:px-6 py-4 shrink-0">
+            <div className="flex items-center justify-between border-b border-gray-200 px-4 sm:px-6 py-4 shrink-0">
               <h3 className="text-lg font-bold text-gray-900">Supporting Documents</h3>
               <button type="button" onClick={() => setShowAddDocPopup(false)} className="rounded-full p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-900 transition-colors">
                 <X className="h-5 w-5" />
@@ -207,9 +207,9 @@ export function Step1ConsentDocs() {
       )}
 
       {showSupportingDocPopup && selectedSupportingDoc && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-[999] flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="w-full max-w-4xl rounded-xl bg-white shadow-2xl animate-in zoom-in-95 duration-200 overflow-hidden flex flex-col max-h-[90vh]">
-            <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4 bg-white shrink-0">
+            <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4 bg-white shrink-0">
               <h3 className="text-lg font-medium text-gray-900">{selectedSupportingDoc.name}</h3>
               <button type="button" onClick={() => setShowSupportingDocPopup(false)} className="rounded-full p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-900 transition-colors">
                 <X className="h-5 w-5" />
@@ -234,9 +234,9 @@ export function Step1ConsentDocs() {
       )}
 
       {showConsentDocumentPopup && consentFile && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-[999] flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="w-full max-w-4xl rounded-xl bg-white shadow-2xl animate-in zoom-in-95 duration-200 overflow-hidden flex flex-col max-h-[90vh]">
-            <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4 bg-white shrink-0">
+            <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4 bg-white shrink-0">
               <h3 className="text-lg font-medium text-gray-900">{consentFile.name}</h3>
               <button type="button" onClick={() => setShowConsentDocumentPopup(false)} className="rounded-full p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-900 transition-colors">
                 <X className="h-5 w-5" />
@@ -261,9 +261,9 @@ export function Step1ConsentDocs() {
       )}
 
       {showConsentPopup && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-[999] flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="w-full max-w-2xl rounded-xl bg-white shadow-2xl animate-in zoom-in-95 duration-200">
-            <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
+            <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4">
               <h3 className="text-lg font-medium text-gray-900">Signed Consent Form</h3>
               <button type="button" onClick={() => setShowConsentPopup(false)} className="text-gray-900 hover:text-gray-500 transition-colors">
                 <X className="h-5 w-5" />

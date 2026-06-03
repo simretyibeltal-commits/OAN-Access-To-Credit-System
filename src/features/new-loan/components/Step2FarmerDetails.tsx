@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { useDispatch } from 'react-redux';
-import { nextStep, prevStep } from '@/features/new-loan/store/newLoanFormSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { nextStep, prevStep, setFormData as setFormDataAction } from '@/features/new-loan/store/newLoanFormSlice';
 import { ArrowLeft, ArrowRight, Check, Loader2 } from 'lucide-react';
 import { TextField } from '@/components/ui/TextField';
 import { SelectField } from '@/components/ui/SelectField';
 import { GENDER_OPTIONS } from '@/features/loans/constants/loans.constants';
-import type { AppDispatch } from '@/store';
+import type { AppDispatch, RootState } from '@/store';
 
 export function Step2FarmerDetails() {
   const dispatch = useDispatch<AppDispatch>();
+  const savedFormData = useSelector((state: RootState) => state.loanForm.formData);
 
-  // Pre-filling with data from the screenshot mockup
+  // Pre-filling with data from the screenshot mockup, merged with Redux state
   const [formData, setFormData] = useState<Record<string, string>>({
     firstName: 'Abebe Bekele',
     lastName: 'Tadesse',
@@ -18,15 +19,19 @@ export function Step2FarmerDetails() {
     dateOfBirth: 'May 15, 1990',
     gender: 'Male',
     woreda: 'Bishoftu',
-    kebele: 'Bishoftu',
-    idType: '29838928923',
-    idNumber: '29838928923',
-    language: 'English',
-    landSize: '12',
+    kebele: 'Kebele 01',
+    idType: 'National ID',
+    idNumber: 'ID-987654321',
+    language: 'Oromo',
+    landSize: '2.5 Hectares',
     farmId: '29838928923',
     farmPolygon: 'Farm Polygon',
     landAcreage: 'Land Acreage',
     farmLandNumber: '29838928923',
+    primaryCrop: 'Wheat',
+    loanType: 'Input',
+    purpose: 'Agro-processing (e.g., milling grain)',
+    requestedAmount: '50,000 ETB',
     maritalStatus: 'Married',
     sizeOfFamily: '4',
     numberOfChildren: '3',
@@ -43,18 +48,22 @@ export function Step2FarmerDetails() {
     farmlandSizeHectares: 'Capacity for production',
     landOwnershipStatus: 'Security of access 4',
     soilFertility: 'Future yield potential',
-    moistureLevels: 'Irrigation / drought risks'
+    moistureLevels: 'Irrigation / drought risks',
+    ...savedFormData
   });
 
-  const handleChange = (key: string) => (val: string) => setFormData(f => ({ ...f, [key]: val }));
+  const handleChange = (field: string) => (value: string | number) => {
+    setFormData(prev => ({ ...prev, [field]: value.toString() }));
+  };
 
-  const [isSavingDraft, setIsSavingDraft] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<string | null>(null);
 
   const handleSaveDraft = () => {
-    setIsSavingDraft(true);
+    setIsSaving(true);
+    dispatch(setFormDataAction(formData));
     setTimeout(() => {
-      setIsSavingDraft(false);
+      setIsSaving(false);
       const timeString = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
       setLastSaved(`Auto-saved at ${timeString}`);
     }, 1000);
@@ -65,10 +74,11 @@ export function Step2FarmerDetails() {
       handleSaveDraft();
     }, 60000); // Auto save every 60 seconds
     return () => clearInterval(timer);
-  }, []);
+  }, [formData]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    dispatch(setFormDataAction(formData));
     dispatch(nextStep());
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -162,11 +172,11 @@ export function Step2FarmerDetails() {
           <button
             type="button"
             onClick={handleSaveDraft}
-            disabled={isSavingDraft}
-            className="flex flex-1 sm:flex-none justify-center items-center gap-2 rounded-md border border-[#16335A] text-[#16335A] px-8 py-2.5 text-sm font-semibold hover:bg-blue-50 transition-colors disabled:opacity-50"
+            disabled={isSaving}
+            className="rounded-md border border-[#16335A] px-5 py-2.5 text-[15px] font-bold text-[#16335A] hover:bg-blue-50 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
           >
-            {isSavingDraft && <Loader2 className="h-4 w-4 animate-spin" />}
-            {isSavingDraft ? 'Saving...' : 'Save Draft'}
+            {isSaving && <Loader2 className="h-4 w-4 animate-spin" />}
+            {isSaving ? 'Saving...' : 'Save Draft'}
           </button>
           <div className="flex items-center justify-center sm:justify-start gap-2 text-[15px] font-normal text-[#16335A]">
             <Check className="h-5 w-5 text-[#16335A]" /> {lastSaved || 'Auto-saved'}

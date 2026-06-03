@@ -50,7 +50,7 @@ function UpdatePanel({ loan, onClose, onConfirm }: any) {
       {/* slide-over panel */}
       <aside className="fixed right-0 top-0 z-50 flex h-full w-full max-w-[500px] flex-col bg-white shadow-2xl">
         {/* header */}
-        <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
+        <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4">
           <div className="flex items-center gap-2.5">
             <RefreshCcw size={20} className="text-text-primary" strokeWidth={2} />
             <h3 className="text-lg font-semibold text-text-primary">Update Loan Status</h3>
@@ -141,8 +141,8 @@ function UpdatePanel({ loan, onClose, onConfirm }: any) {
                         type="button"
                         onClick={() => { setNewStatus(s); setReason(''); }}
                         className={`flex items-center gap-3 rounded-xl border px-3.5 py-3 text-left transition ${sel
-                            ? 'border-green-500 bg-green-50'
-                            : 'border-gray-200 bg-white hover:border-gray-300 hover:bg-slate-50'
+                          ? 'border-green-500 bg-green-50'
+                          : 'border-gray-200 bg-white hover:border-gray-300 hover:bg-slate-50'
                           }`}
                       >
                         <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${cfg?.dot ?? 'bg-slate-400'}`} />
@@ -169,8 +169,8 @@ function UpdatePanel({ loan, onClose, onConfirm }: any) {
                         type="button"
                         onClick={() => setReason(r)}
                         className={`rounded-lg border px-3.5 py-2 text-sm font-medium transition ${reason === r
-                            ? 'border-green-600 bg-green-50 text-green-700'
-                            : 'border-gray-200 text-text-muted hover:border-gray-300 hover:text-text-primary'
+                          ? 'border-green-600 bg-green-50 text-green-700'
+                          : 'border-gray-200 text-text-muted hover:border-gray-300 hover:text-text-primary'
                           }`}
                       >
                         {r}
@@ -333,8 +333,8 @@ function UpdateLoanStatus() {
               type="button"
               onClick={() => { setActiveTab(tab); setPage(1); }}
               className={`flex shrink-0 items-center gap-2 whitespace-nowrap border-b-2 py-4 px-3 text-sm font-medium transition ${activeTab === tab
-                  ? 'border-green-600 text-green-600'
-                  : 'border-transparent text-text-muted hover:text-text-primary'
+                ? 'border-green-600 text-green-600'
+                : 'border-transparent text-text-muted hover:text-text-primary'
                 }`}
             >
               {tab}
@@ -456,8 +456,8 @@ function UpdateLoanStatus() {
                 onClick={() => setPage(pg)}
                 aria-current={safePage === pg ? 'page' : undefined}
                 className={`h-9 w-9 rounded-lg text-sm font-medium transition ${safePage === pg
-                    ? 'bg-green-600 text-white'
-                    : 'border border-[#e9e9e9] bg-white text-text-muted hover:bg-slate-50'
+                  ? 'bg-green-600 text-white'
+                  : 'border border-[#e9e9e9] bg-white text-text-muted hover:bg-slate-50'
                   }`}
               >
                 {pg}
