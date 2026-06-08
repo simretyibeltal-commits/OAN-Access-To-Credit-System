@@ -78,7 +78,7 @@ pipeline {
 
                         set -e
 
-                        mkdir -p /opt/oan_a2c_frontend
+                        
                         cd /opt/oan_a2c_frontend
 
                         aws ecr get-login-password --region ap-south-1 | \
