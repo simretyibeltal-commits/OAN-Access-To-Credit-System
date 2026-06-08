@@ -85,18 +85,7 @@ pipeline {
                         docker login --username AWS --password-stdin \
                         ${AWS_ACCOUNT_ID}.dkr.ecr.ap-south-1.amazonaws.com
 
-                        cat > docker-compose.yaml <<COMPOSEEOF
-services:
-  frontend:
-    image: ${AWS_ACCOUNT_ID}.dkr.ecr.ap-south-1.amazonaws.com/oan-a2c-frontend:develop
-    container_name: oan_a2c_frontend
-    restart: unless-stopped
-    ports:
-      - "3000:3000"
-    environment:
-      NEXT_PUBLIC_API_BASE_URL: https://a2c-backend.oanstaging.com
-COMPOSEEOF
-
+                      
                         docker compose pull
                         docker compose down || true
                         docker compose up -d
