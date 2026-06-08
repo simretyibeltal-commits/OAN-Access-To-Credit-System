@@ -79,7 +79,7 @@ pipeline {
                         set -e
 
                         
-                        cd /opt/oan_a2c_frontend
+                        cd /opt/oan_a2c_fe
 
                         aws ecr get-login-password --region ap-south-1 | \
                         docker login --username AWS --password-stdin \
