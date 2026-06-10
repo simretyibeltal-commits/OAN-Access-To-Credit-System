@@ -76,6 +76,13 @@ export const loanService = {
     return fetchApi(`oan_a2c.api.v1.loan_applications.get_supporting_documents?application_id=${application_id}`);
   },
 
+  async deleteSupportingDocument(application_id: string, file_id: string): Promise<any> {
+    return fetchApi('oan_a2c.api.v1.loan_applications.delete_supporting_document', {
+      method: 'POST',
+      body: JSON.stringify({ application_id, file_id }),
+    });
+  },
+
 
 
   async sendOtpAndCreateConsent(data: any): Promise<any> {
@@ -112,6 +119,13 @@ export const loanService = {
     return fetchApi('oan_a2c.api.v1.loan_applications.update_loan_status', {
       method: 'POST',
       body: JSON.stringify({ application_id, status }),
+    });
+  },
+
+  async updateLoanStep(application_id: string, step: number): Promise<any> {
+    return fetchApi('oan_a2c.api.v1.loan_applications.update_loan_step', {
+      method: 'POST',
+      body: JSON.stringify({ application_id, step }),
     });
   },
 };
