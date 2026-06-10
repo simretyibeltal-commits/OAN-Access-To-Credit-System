@@ -376,11 +376,11 @@ export default function LoanAdvancedFilters({ isOpen, onClose }: LoanAdvancedFil
         </div>
 
         {/* Footer */}
-        <div className="flex gap-3 border-t border-gray-300 px-5 py-6 bg-gray-100">
+        <div className="flex gap-3 border-t border-gray-300 px-5 py-6 bg-gray-100 font-bold font-semibold">
           <button
             type="button"
             onClick={handleReset}
-            className="flex-1 rounded-xl border border-gray-200 bg-white py-4 mb-3 text-base font-medium text-[#232F34] transition hover:bg-slate-50"
+            className="flex-1 rounded-xl border border-gray-200 bg-white py-4 mb-3 text-base font-semibold text-[#232F34] transition hover:bg-slate-50"
           >
             Reset Filters
           </button>
@@ -391,7 +391,7 @@ export default function LoanAdvancedFilters({ isOpen, onClose }: LoanAdvancedFil
           >
             Apply Filters
             {activeCount > 0 && (
-              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white/25 text-xs font-bold">
+              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white/25 text-xs">
                 {activeCount}
               </span>
             )}

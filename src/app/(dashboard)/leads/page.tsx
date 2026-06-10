@@ -51,6 +51,7 @@ export default function LeadsDashboard() {
   const advFilters = useAppSelector(selectAdvFilters);
 
   const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
   const [showAdvFilters, setShowAdvFilters] = useState(false);
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [openColFilter, setOpenColFilter] = useState<string | null>(null);
@@ -101,8 +102,8 @@ export default function LeadsDashboard() {
     const lead_source = advFilters.leadSources?.length > 0 ? advFilters.leadSources.join(',') : undefined;
 
     dispatch(fetchLeads({
-      start: (page - 1) * PAGE_SIZE,
-      page_length: PAGE_SIZE,
+      start: (page - 1) * pageSize,
+      page_length: pageSize,
       search_query: finalSearch,
       status: statusParam,
       start_date,
@@ -114,10 +115,10 @@ export default function LeadsDashboard() {
     }));
   }, [dispatch, colStatusFilter, search, advFilters, dateFilter]);
 
-  // fetched only once during mount
+  // fetched only once during mount or when dependencies change
   useEffect(() => {
     loadLeads(currentPage);
-  }, [loadLeads, currentPage]);
+  }, [loadLeads, currentPage, pageSize]);
 
 
   const liveKpiStats = useMemo(() => {
@@ -138,17 +139,26 @@ export default function LeadsDashboard() {
   }, [leadSummary]);
 
   const currentTabTotalCount = activeTab === 'my' ? tabCounts.my : activeTab === 'unassigned' ? tabCounts.unassigned : tabCounts.all;
-  const totalPages = Math.max(1, Math.ceil(currentTabTotalCount / PAGE_SIZE));
+  const totalPages = Math.max(1, Math.ceil(currentTabTotalCount / pageSize));
   const safePage = Math.min(currentPage, totalPages);
 
   // Filter leads locally for the active tab since backend does not apply assigned_to parameter
   const visible = useMemo(() => {
-    return allLeads.filter((lead: any) => {
+    const filtered = allLeads.filter((lead: any) => {
       if (activeTab === 'my') return lead.assignedTo === 'me' || lead.owner === 'me';
       if (activeTab === 'unassigned') return !lead.assignedTo || lead.owner === 'unassigned';
       return true;
     });
-  }, [allLeads, activeTab]);
+    
+    // If backend returns all leads ignoring pagination, paginate locally
+    if (allLeads.length > pageSize) {
+      const start = (currentPage - 1) * pageSize;
+      return filtered.slice(start, start + pageSize);
+    }
+    
+    // Otherwise just ensure we never exceed pageSize
+    return filtered.slice(0, pageSize);
+  }, [allLeads, activeTab, currentPage, pageSize]);
 
   const pageNums = useMemo(() => {
     if (totalPages <= 5) return Array.from({ length: totalPages }, (_, i) => i + 1);
@@ -240,6 +250,11 @@ export default function LeadsDashboard() {
           totalPages={totalPages}
           pageNums={pageNums}
           onPageChange={setCurrentPage}
+          pageSize={pageSize}
+          onPageSizeChange={(newSize) => {
+            setPageSize(newSize);
+            setCurrentPage(1);
+          }}
         />
       </div>
 

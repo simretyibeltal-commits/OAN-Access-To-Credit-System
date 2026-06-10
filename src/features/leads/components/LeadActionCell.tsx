@@ -8,13 +8,13 @@ interface LeadActionCellProps {
 }
 
 // 1.  to prevent re-allocation on every render
-const BASE_CLASS = "inline-flex items-center justify-center gap-2 rounded-[4px] border border-[#EDEFF1] bg-white px-3 py-2 text-xs font-medium text-[#3A474E] shadow-[0px_1px_2px_rgba(0,0,0,0.05)] w-[111.71px] h-[40px] select-none outline-none";
+const BASE_CLASS = "inline-flex items-center justify-center gap-2 rounded-[4px] border border-[#EDEFF1] bg-white px-4 py-2 text-sm font-semibold text-[#3A474E] shadow-[0px_1px_2px_rgba(0,0,0,0.05)] w-[120px] h-[40px] select-none outline-none";
 
 const BTN_CLASS = `${BASE_CLASS} cursor-pointer transition-all hover:bg-slate-50 active:scale-95`;
 const BADGE_CLASS = `${BASE_CLASS} cursor-default`;
 
 const ICON_PROPS = {
-  size: 12,
+  size: 16,
   className: "text-[#3A474E]"
 } as const;
 

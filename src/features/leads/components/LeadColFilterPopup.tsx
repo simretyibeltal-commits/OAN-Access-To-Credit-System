@@ -43,6 +43,14 @@ export function LeadColFilterPopup({ col, anchorRef, initialSelected = [], onApp
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [anchorRef, onClose]);
 
+  useEffect(() => {
+    const originalStyle = window.getComputedStyle(document.body).overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = originalStyle;
+    };
+  }, []);
+
   const opts = COL_FILTER_OPTS[col] ?? [];
   const toggle = (v: string) => setSelected(p => p.includes(v) ? p.filter(x => x !== v) : [...p, v]);
 
@@ -50,48 +58,42 @@ export function LeadColFilterPopup({ col, anchorRef, initialSelected = [], onApp
     <div
       ref={popupRef}
       style={{ position: 'fixed', top: pos.top, left: pos.left, zIndex: 9999 }}
-      className="w-56 rounded-xl border border-gray-200 bg-white shadow-xl"
+      className="flex w-[240px] flex-col rounded-xl border border-gray-200 bg-white shadow-xl normal-case tracking-normal text-gray-900"
     >
-      <div className="border-b border-gray-100 px-3 py-2.5">
-        <div className="flex items-center gap-1.5">
-          <Filter size={13} className="text-green-600" strokeWidth={2.5} />
-          <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
-            {col === 'CALL START TIME' ? 'Filter by Date' : `Filter by ${col}`}
-          </p>
-        </div>
+      <div className="flex items-center gap-2 border-b border-gray-100 px-5 py-4 text-sm font-bold text-gray-500 uppercase tracking-wide">
+        <Filter size={16} className="text-emerald-600" /> 
+        {col === 'CALL START TIME' ? 'FILTER BY DATE' : `FILTER BY ${col}`}
       </div>
-      <ul className="max-h-52 overflow-y-auto py-1">
+      <div className="flex flex-col p-2 max-h-[200px] overflow-y-auto">
         {opts.map(o => {
           const sel = selected.includes(o);
           return (
-            <li
+            <button
               key={o}
+              type="button"
               onMouseDown={e => { e.preventDefault(); toggle(o); }}
-              className="flex cursor-pointer items-center gap-2.5 px-3 py-2 text-sm transition hover:bg-gray-50"
+              className="flex items-center gap-3 rounded-lg px-4 py-3 text-base font-medium transition-colors hover:bg-gray-50 text-gray-700 text-left"
             >
-              <input
-                type="checkbox"
-                readOnly
-                checked={sel}
-                className="h-4 w-4 rounded border-gray-300 accent-green-600 pointer-events-none"
-              />
-              <span className={sel ? 'font-medium text-[#16A34A]' : 'text-gray-700'}>{o}</span>
-            </li>
+              <span className={`inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-[4px] border ${sel ? 'border-emerald-500 bg-emerald-500 text-white' : 'border-gray-300 bg-white'}`}>
+                {sel && <Check size={14} strokeWidth={3} />}
+              </span>
+              {o}
+            </button>
           );
         })}
-      </ul>
-      <div className="flex items-center justify-between border-t border-gray-100 px-3 py-2">
+      </div>
+      <div className="flex items-center justify-between border-t border-gray-100 p-4 bg-gray-50/50 rounded-b-xl">
         <button
           type="button"
           onClick={() => { setSelected([]); onApply([]); onClose(); }}
-          className="text-xs font-medium text-gray-400 transition hover:text-red-500"
+          className="text-base font-medium text-gray-400 hover:text-gray-600"
         >
           Clear
         </button>
         <button
           type="button"
           onClick={() => { onApply(selected); onClose(); }}
-          className="rounded-lg bg-[#16A34A] px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-[#10883c]"
+          className="rounded-lg bg-[#16A34A] px-5 py-2.5 text-base font-semibold text-white shadow-sm transition hover:bg-[#10883c]"
         >
           Apply
         </button>

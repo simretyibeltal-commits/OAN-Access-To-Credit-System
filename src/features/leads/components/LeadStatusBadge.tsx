@@ -19,38 +19,45 @@ const mapStatusToKpiLabel = (status?: string): string => {
 
 const STATUS_STYLE_MAP: Record<string, { badgeClass: string; dotClass: string }> = {
   Active: {
-    badgeClass: "bg-blue-50/70 border border-blue-200/50 text-[#3B82F6]",
-    dotClass: "bg-[#3B82F6]"
+    badgeClass: "bg-blue-50 text-blue-500 border border-blue-200",
+    dotClass: "bg-blue-500"
   },
   Verified: {
-    badgeClass: "bg-[rgba(50,164,127,0.1)] border border-[rgba(50,164,127,0.2)] text-[#32A47F]",
-    dotClass: "bg-[#32A47F]"
+    badgeClass: "bg-emerald-50 text-emerald-600 border border-emerald-200",
+    dotClass: "bg-emerald-500"
   },
   Processed: {
-    badgeClass: "bg-[#CCFBF1] border border-teal-200/30 text-[#115E59]",
-    dotClass: "bg-[#0D9488]"
+    badgeClass: "bg-emerald-50 text-emerald-600 border border-emerald-200",
+    dotClass: "bg-emerald-500"
+  },
+  Granted: {
+    badgeClass: "bg-emerald-50 text-emerald-600 border border-emerald-200",
+    dotClass: "bg-emerald-500"
   },
   Rejected: {
-    badgeClass: "bg-amber-50/70 border border-amber-200/50 text-[#F59E0B]",
-    dotClass: "bg-[#F59E0B]"
+    badgeClass: "bg-red-50 text-red-500 border border-red-200",
+    dotClass: "bg-red-500"
   },
   Dormant: {
-    badgeClass: "bg-indigo-50/70 border border-indigo-200/50 text-[#4F46E5]",
-    dotClass: "bg-[#4F46E5]"
+    badgeClass: "bg-gray-50 text-gray-500 border border-gray-200",
+    dotClass: "bg-gray-500"
   }
 };
 
 function LeadStatusBadge({ status }: LeadStatusBadgeProps) {
   const kpiLabel = mapStatusToKpiLabel(status);
+  
+  const displayLabel = kpiLabel.replace('Verified', 'Approved').replace('Active', 'Processing');
+
   const cfg = STATUS_STYLE_MAP[kpiLabel] ?? {
-    badgeClass: 'bg-slate-50 text-slate-600 border border-slate-200',
-    dotClass: 'bg-slate-400'
+    badgeClass: 'bg-gray-100 text-gray-600 border border-gray-200',
+    dotClass: 'bg-gray-400'
   };
 
   return (
-    <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold select-none ${cfg.badgeClass}`}>
-      <span className={`h-1.5 w-1.5 rounded-full ${cfg.dotClass}`} />
-      {kpiLabel}
+    <span className={`inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-sm font-semibold select-none ${cfg.badgeClass}`}>
+      <span className={`h-2 w-2 shrink-0 rounded-full ${cfg.dotClass}`} />
+      {displayLabel}
     </span>
   );
 }
