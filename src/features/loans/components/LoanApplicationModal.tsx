@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { X, CheckCircle2, User, Lock, Building2 } from 'lucide-react';
+import { X, CheckCircle2, User, Lock, Building2, Loader2 } from 'lucide-react';
 import { LoanTableRow } from './LoanTable';
+import { loanService } from '../api/loan.service';
 
 interface LoanApplicationModalProps {
   isOpen: boolean;
@@ -20,16 +21,36 @@ const Field = ({ label, value }: { label: string; value: string | null | undefin
 
 export default function LoanApplicationModal({ isOpen, onClose, data }: LoanApplicationModalProps) {
   const [mounted, setMounted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [fullProfile, setFullProfile] = useState<any>(null);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
+  useEffect(() => {
+    const fetchId = data?.application_id || data?.id;
+    if (isOpen && fetchId) {
+      setIsLoading(true);
+      loanService.getFullProfile(fetchId)
+        .then((profileRes) => {
+          setFullProfile(profileRes?.data || null);
+          setIsLoading(false);
+        })
+        .catch((err) => {
+          console.error("Failed to fetch full profile:", err);
+          setIsLoading(false);
+        });
+    } else {
+      setFullProfile(null);
+    }
+  }, [isOpen, data?.application_id, data?.id]);
+
   if (!mounted || !isOpen || !data) return null;
 
   const modalContent = (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm overflow-y-auto">
-      <div 
+      <div
         className="w-full max-w-[850px] bg-white rounded-xl shadow-2xl overflow-hidden relative animate-in fade-in zoom-in duration-200"
         onClick={(e) => e.stopPropagation()}
       >
@@ -41,7 +62,7 @@ export default function LoanApplicationModal({ isOpen, onClose, data }: LoanAppl
               ID: {data.id} &bull; Submitted {data.updated}
             </p>
           </div>
-          <button 
+          <button
             onClick={onClose}
             className="flex items-center justify-center h-8 w-8 rounded-lg bg-white/20 text-white hover:bg-white/30 transition-colors"
           >
@@ -60,27 +81,33 @@ export default function LoanApplicationModal({ isOpen, onClose, data }: LoanAppl
 
         {/* Body content */}
         <div className="px-8 py-8 overflow-y-auto max-h-[60vh] space-y-10 custom-scrollbar">
-          
+
           {/* Section 1: Farmer Information */}
           <section>
             <div className="flex items-center gap-2 mb-6">
               <User size={20} className="text-[#3b5998]" fill="#3b5998" />
               <h4 className="text-[17px] font-bold text-gray-900">Farmer Information</h4>
             </div>
-            <div className="grid grid-cols-3 gap-y-6 gap-x-8">
-              <Field label="FULL NAME" value={data.applicant} />
-              <Field label="FATHER'S NAME" value={null} />
-              <Field label="FARMER ID" value="FR - 1234567890" />
-              <Field label="DATE OF BIRTH" value={null} />
-              <Field label="GENDER" value={null} />
-              <Field label="MARITAL STATUS" value={null} />
-              <Field label="MOBILE PHONE" value={data.phone} />
-              <Field label="EDUCATION LEVEL" value={null} />
-              <Field label="NATIONAL ID" value={null} />
-              <Field label="REGION" value="Oromia" />
-              <Field label="WOREDA" value="Bishoftu" />
-              <Field label="KEBELE" value={null} />
-            </div>
+            {isLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="w-6 h-6 animate-spin text-[#387f50]" />
+              </div>
+            ) : (
+              <div className="grid grid-cols-3 gap-y-6 gap-x-8">
+                <Field label="FULL NAME" value={fullProfile ? `${fullProfile.first_name} ${fullProfile.last_name}` : data.applicant} />
+                <Field label="FATHER'S NAME" value={fullProfile?.father_name || null} />
+                <Field label="FARMER ID" value={fullProfile?.farmer_id || null} />
+                <Field label="DATE OF BIRTH" value={fullProfile?.date_of_birth || null} />
+                <Field label="GENDER" value={fullProfile?.gender || null} />
+                <Field label="MARITAL STATUS" value={fullProfile?.marital_status || null} />
+                <Field label="MOBILE PHONE" value={fullProfile?.phone_number || data.phone || null} />
+                <Field label="EDUCATION LEVEL" value={fullProfile?.education_level || null} />
+                <Field label="NATIONAL ID" value={fullProfile?.national_id || null} />
+                <Field label="REGION" value={fullProfile?.location || data.region || null} />
+                <Field label="WOREDA" value={fullProfile?.woreda || null} />
+                <Field label="KEBELE" value={fullProfile?.kebele || null} />
+              </div>
+            )}
           </section>
 
           {/* Section 2: Loan Details */}
@@ -89,16 +116,22 @@ export default function LoanApplicationModal({ isOpen, onClose, data }: LoanAppl
               <Lock size={20} className="text-[#bfae34]" fill="#bfae34" />
               <h4 className="text-[17px] font-bold text-gray-900">Loan Details</h4>
             </div>
-            <div className="grid grid-cols-3 gap-y-6 gap-x-8">
-              <Field label="LOAN TYPE" value={data.type} />
-              <Field label="PURPOSE" value="Agro-processing (e.g., milling grain)" />
-              <Field label="REQUESTED AMOUNT" value={data.loanAmount} />
-              <Field label="DURATION" value="12 Months (1 Year)" />
-              <Field label="PRIMARY CROPS" value="Teff" />
-              <Field label="CROP VARIETY" value="Seed + S-Hela/Acherr + Stellar Star" />
-              <Field label="LAND SIZE" value={null} />
-              <Field label="EXPECTED YIELD" value={null} />
-            </div>
+            {isLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="w-6 h-6 animate-spin text-[#387f50]" />
+              </div>
+            ) : (
+              <div className="grid grid-cols-3 gap-y-6 gap-x-8">
+                <Field label="LOAN TYPE" value={fullProfile?.loan_type || data.type || null} />
+                <Field label="PURPOSE" value={fullProfile?.loan_reason || fullProfile?.purpose || null} />
+                <Field label="REQUESTED AMOUNT" value={fullProfile?.loan_amount ? `ETB ${fullProfile.loan_amount.toLocaleString()}` : (data.loanAmount || null)} />
+                <Field label="DURATION" value={fullProfile?.duration || null} />
+                <Field label="PRIMARY CROPS" value={fullProfile?.primary_crops || null} />
+                <Field label="CROP VARIETY" value={fullProfile?.crop_variety || null} />
+                <Field label="LAND SIZE" value={fullProfile?.farmland_size_hectares ? `${fullProfile.farmland_size_hectares} Hectares` : null} />
+                <Field label="EXPECTED YIELD" value={fullProfile?.expected_yield || null} />
+              </div>
+            )}
           </section>
 
           {/* Section 3: Banking Information */}
@@ -108,10 +141,10 @@ export default function LoanApplicationModal({ isOpen, onClose, data }: LoanAppl
               <h4 className="text-[17px] font-bold text-gray-900">Banking Information</h4>
             </div>
             <div className="grid grid-cols-3 gap-y-6 gap-x-8">
-              <Field label="BANK ACCOUNT NO." value={null} />
-              <Field label="IFSC / FSC CODE" value={null} />
-              <Field label="BANK NAME" value={null} />
-              <Field label="ACCOUNT HOLDER" value={null} />
+              <Field label="BANK ACCOUNT NO." value={fullProfile?.bank_account_no || null} />
+              <Field label="IFSC / FSC CODE" value={fullProfile?.ifsc_code || null} />
+              <Field label="BANK NAME" value={fullProfile?.bank_name || null} />
+              <Field label="ACCOUNT HOLDER" value={fullProfile?.account_holder || null} />
             </div>
           </section>
 
@@ -122,7 +155,7 @@ export default function LoanApplicationModal({ isOpen, onClose, data }: LoanAppl
           <span className="text-xs font-medium text-gray-400">
             {mounted ? `Generated on ${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} • ${new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}` : 'Loading...'}
           </span>
-          <button 
+          <button
             onClick={onClose}
             className="bg-[#387f50] hover:bg-[#2c633f] text-white px-6 py-2.5 rounded-lg text-sm font-bold shadow-sm transition-colors active:scale-95"
           >

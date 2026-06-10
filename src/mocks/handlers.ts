@@ -343,6 +343,17 @@ export const handlers = [
           certification_id: null,
           certification_photo_url: null,
           consent_id: null,
+          loan_amount: 50000.0,
+          loan_type: "Input Loan",
+          loan_reason: "Buy fertilizer and seeds",
+          duration: "12 Months",
+          primary_crops: "Wheat, Barley",
+          crop_variety: "Local",
+          expected_yield: 25,
+          bank_account_no: "1000123456789",
+          ifsc_code: "COOPETAA",
+          bank_name: "Cooperative Bank of Oromia",
+          account_holder: "Yosef Tekle",
           doctype: "A2C Loan Application"
         }
       }
@@ -386,6 +397,16 @@ export const handlers = [
       message: {
         status: "success",
         message: "Document uploaded successfully"
+      }
+    });
+  }),
+
+  http.post('*/api/proxy/api/method/oan_a2c.api.v1.loan_applications.update_loan_step', async ({ request }) => {
+    const data = await request.json() as any;
+    return HttpResponse.json({
+      message: {
+        status: "success",
+        message: `Loan application step updated to ${data.step}`
       }
     });
   }),
