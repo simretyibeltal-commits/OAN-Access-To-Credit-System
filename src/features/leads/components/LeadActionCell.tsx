@@ -49,7 +49,6 @@ const LeadActionCell = memo(({ lead, navigate }: LeadActionCellProps) => {
           <span className='text-[14px]'>Rejected</span>
         </span>
       );
-
     case 'view':
     default:
       return (
