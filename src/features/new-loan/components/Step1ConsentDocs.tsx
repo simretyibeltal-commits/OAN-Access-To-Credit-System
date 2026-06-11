@@ -1,27 +1,39 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useDispatch } from 'react-redux';
-import { nextStep } from '@/features/new-loan/store/newLoanFormSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { nextStepAPI, uploadDocumentAPI, selectLoanFormState } from '@/features/new-loan/store/newLoanFormSlice';
+import { loanService } from '@/features/loans/api/loan.service';
 import { ArrowRight, CheckCircle2, FileText, Loader2, FolderOpen, Eye, EyeOff, X, Check, ChevronDown, Info } from 'lucide-react';
 import type { AppDispatch } from '@/store';
 
 export function Step1ConsentDocs() {
   const dispatch = useDispatch<AppDispatch>();
+  const { applicationId } = useSelector(selectLoanFormState);
   const [faydaId, setFaydaId] = useState('**********');
   const [showFaydaId, setShowFaydaId] = useState(false);
   const [showConsentPopup, setShowConsentPopup] = useState(false);
   const [showConsentDocumentPopup, setShowConsentDocumentPopup] = useState(false);
 
-  type SupportingDoc = { id: number; type: string; name: string; description: string; file?: File };
+  type SupportingDoc = { id: string | number; type: string; name: string; description: string; file?: File; fileUrl?: string };
 
   const [showSupportingDocPopup, setShowSupportingDocPopup] = useState(false);
   const [selectedSupportingDoc, setSelectedSupportingDoc] = useState<SupportingDoc | null>(null);
   const [supportPreviewUrl, setSupportPreviewUrl] = useState<string | null>(null);
 
   useEffect(() => {
-    if (selectedSupportingDoc?.file) {
+    if (!selectedSupportingDoc) {
+      setSupportPreviewUrl(null);
+      return;
+    }
+
+    if (selectedSupportingDoc.file) {
       const url = URL.createObjectURL(selectedSupportingDoc.file);
       setSupportPreviewUrl(url);
       return () => URL.revokeObjectURL(url);
+    } else if (selectedSupportingDoc.fileUrl) {
+      const url = selectedSupportingDoc.fileUrl.startsWith('/')
+        ? `/api/proxy${selectedSupportingDoc.fileUrl}`
+        : selectedSupportingDoc.fileUrl;
+      setSupportPreviewUrl(url);
     } else {
       setSupportPreviewUrl(null);
     }
@@ -35,10 +47,30 @@ export function Step1ConsentDocs() {
   const addDocFileRef = useRef<HTMLInputElement>(null);
 
 
-  const [supportingDocs, setSupportingDocs] = useState<SupportingDoc[]>([
-    { id: 1, type: 'ID Proof', name: 'householdID.png', description: 'Household ID added for 2 members' },
-    { id: 2, type: 'ID Proof', name: 'householdID.png', description: 'Household ID added for 2 members' }
-  ]);
+  const [supportingDocs, setSupportingDocs] = useState<SupportingDoc[]>([]);
+
+  const loadDocs = (appId: string) => {
+    loanService.listSupportingDocuments(appId)
+      .then(res => {
+        if (res?.status === 'success' && Array.isArray(res.files)) {
+          const fetchedDocs = res.files.map((f: any) => ({
+            id: f.name,
+            type: 'Uploaded Document',
+            name: f.file_name,
+            description: `Uploaded on ${f.creation}`,
+            fileUrl: f.file_url,
+          }));
+          setSupportingDocs(fetchedDocs);
+        }
+      })
+      .catch(err => console.error('Failed to fetch documents', err));
+  };
+
+  useEffect(() => {
+    if (applicationId) {
+      loadDocs(applicationId);
+    }
+  }, [applicationId]);
 
   const [isSavingDraft, setIsSavingDraft] = useState(false);
   const [lastSaved, setLastSaved] = useState<string | null>(null);
@@ -75,23 +107,27 @@ export function Step1ConsentDocs() {
     }
   }, [consentFile]);
 
-  const handleConsentUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setConsentFile(e.target.files[0]);
+  const handleConsentUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0] && applicationId) {
+      const file = e.target.files[0];
+      setConsentFile(file);
       setIsConsentUploading(true);
-      setConsentProgress(0);
+      setConsentProgress(10); // initial fake progress while uploading
 
-      // Simulate upload progress
-      let p = 0;
-      const interval = setInterval(() => {
-        p += 20;
-        if (p >= 100) {
-          p = 100;
-          setIsConsentUploading(false);
-          clearInterval(interval);
-        }
-        setConsentProgress(p);
-      }, 300);
+      try {
+        await dispatch(uploadDocumentAPI({
+          application_id: applicationId,
+          document_type: 'Consent Form',
+          file: file
+        })).unwrap();
+        setConsentProgress(100);
+      } catch (err) {
+        console.error('Failed to upload consent form', err);
+        setConsentProgress(0);
+        setConsentFile(null);
+      } finally {
+        setIsConsentUploading(false);
+      }
     }
   };
 
@@ -103,34 +139,84 @@ export function Step1ConsentDocs() {
     }
   };
 
-  const handleRemoveSupportingDoc = (id: number) => {
-    setSupportingDocs(docs => docs.filter(doc => doc.id !== id));
+  const handleRemoveSupportingDoc = async (id: string | number) => {
+    if (!applicationId) return;
+    try {
+      if (typeof id === 'string') {
+        const res = await loanService.deleteSupportingDocument(applicationId, id);
+        // Frappe might return status === 'success' or message === 'File deleted successfully' or message.status === 'success'
+        const isSuccess = res?.status === 'success' || res?.message?.status === 'success' || res?.message === 'File deleted successfully' || res?.message?.message === 'File deleted successfully';
+        if (isSuccess) {
+          setSupportingDocs(docs => docs.filter(doc => doc.id !== id));
+        } else {
+          console.error('Failed to delete document on server', res);
+        }
+      } else {
+        setSupportingDocs(docs => docs.filter(doc => doc.id !== id));
+      }
+    } catch (err) {
+      console.error('Failed to delete supporting document:', err);
+    }
   };
 
-  const handleAddSupportingDoc = (e: React.FormEvent) => {
+  const handleAddSupportingDoc = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newDocType || !newDocDesc || !newDocFile) return;
+    if (!newDocType || !newDocDesc || !newDocFile || !applicationId) return;
 
-    const newDoc: SupportingDoc = {
-      id: Date.now(),
-      type: newDocType,
-      name: newDocFile.name,
-      description: newDocDesc,
-      file: newDocFile
-    };
-    setSupportingDocs([...supportingDocs, newDoc]);
+    try {
+      await dispatch(uploadDocumentAPI({
+        application_id: applicationId,
+        document_type: newDocType,
+        file: newDocFile
+      })).unwrap();
 
-    setShowAddDocPopup(false);
-    setNewDocType('');
-    setNewDocDesc('');
-    setNewDocFile(null);
+      loadDocs(applicationId);
+
+      setShowAddDocPopup(false);
+      setNewDocType('');
+      setNewDocDesc('');
+      setNewDocFile(null);
+    } catch (err) {
+      console.error('Failed to upload supporting document', err);
+    }
+  };
+
+  const handleViewDoc = (doc: SupportingDoc) => {
+    const fileType = doc.file?.type || '';
+    const fileName = doc.name.toLowerCase();
+    const isImage = fileType.startsWith('image/') || /\.(jpg|jpeg|png|gif|webp|svg|bmp)$/i.test(fileName);
+    const isPdf = fileType === 'application/pdf' || fileName.endsWith('.pdf');
+
+    if (isImage || isPdf) {
+      setSelectedSupportingDoc(doc);
+      setShowSupportingDocPopup(true);
+    } else {
+      let url = '';
+      if (doc.file) {
+        url = URL.createObjectURL(doc.file);
+      } else if (doc.fileUrl) {
+        url = doc.fileUrl.startsWith('/') ? `/api/proxy${doc.fileUrl}` : doc.fileUrl;
+      }
+      
+      if (url) {
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = doc.name;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        if (doc.file) {
+          setTimeout(() => URL.revokeObjectURL(url), 1000);
+        }
+      }
+    }
   };
 
 
   const handleSubmit = (e: React.FormEvent) => {
 
     e.preventDefault();
-    dispatch(nextStep());
+    dispatch(nextStepAPI());
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -206,32 +292,73 @@ export function Step1ConsentDocs() {
         </div>
       )}
 
-      {showSupportingDocPopup && selectedSupportingDoc && (
-        <div className="fixed inset-0 z-[999] flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="w-full max-w-4xl rounded-xl bg-white shadow-2xl animate-in zoom-in-95 duration-200 overflow-hidden flex flex-col max-h-[90vh]">
-            <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4 bg-white shrink-0">
-              <h3 className="text-lg font-medium text-gray-900">{selectedSupportingDoc.name}</h3>
-              <button type="button" onClick={() => setShowSupportingDocPopup(false)} className="rounded-full p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-900 transition-colors">
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-            <div className="flex-1 bg-gray-100 p-6 overflow-auto flex items-center justify-center min-h-[500px]">
-              {supportPreviewUrl && selectedSupportingDoc.file?.type.startsWith('image/') ? (
-                <img src={supportPreviewUrl} alt="Document Preview" className="max-w-full rounded shadow-sm border border-gray-200 object-contain max-h-[70vh]" />
-              ) : supportPreviewUrl && selectedSupportingDoc.file?.type === 'application/pdf' ? (
-                <iframe src={supportPreviewUrl} className="w-full h-[70vh] border border-gray-200 rounded shadow-sm bg-white" title="Document Preview" />
-              ) : (
-                <div className="bg-white p-8 shadow-sm text-center w-full max-w-2xl min-h-[600px] border border-gray-200 flex flex-col items-center justify-center rounded-lg">
-                  <FileText className="h-16 w-16 text-gray-300 mb-4" />
-                  <p className="text-gray-500 text-lg font-medium">Document Preview</p>
-                  <p className="text-gray-400 text-sm mt-2">({selectedSupportingDoc.name})</p>
-                  {supportPreviewUrl && <p className="text-gray-400 text-xs mt-1">Preview not available for this file type.</p>}
+      {showSupportingDocPopup && selectedSupportingDoc && (() => {
+        const fileType = selectedSupportingDoc.file?.type || '';
+        const fileName = selectedSupportingDoc.name.toLowerCase();
+        const isImage = fileType.startsWith('image/') || /\.(jpg|jpeg|png|gif|webp|svg|bmp)$/i.test(fileName);
+        const isPdf = fileType === 'application/pdf' || fileName.endsWith('.pdf');
+        
+        return (
+          <div className="fixed inset-0 z-[999] flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm animate-in fade-in duration-200">
+            <div className="w-full max-w-4xl rounded-xl bg-white shadow-2xl animate-in zoom-in-95 duration-200 overflow-hidden flex flex-col max-h-[90vh]">
+              <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4 bg-white shrink-0">
+                <h3 className="text-lg font-medium text-gray-900">{selectedSupportingDoc.name}</h3>
+                <div className="flex items-center gap-2">
+                  {supportPreviewUrl && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const link = document.createElement('a');
+                        link.href = supportPreviewUrl;
+                        link.download = selectedSupportingDoc.name;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                      }}
+                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-md border border-gray-300 hover:bg-gray-50 text-gray-700 transition-colors"
+                    >
+                      Download
+                    </button>
+                  )}
+                  <button type="button" onClick={() => setShowSupportingDocPopup(false)} className="rounded-full p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-900 transition-colors">
+                    <X className="h-5 w-5" />
+                  </button>
                 </div>
-              )}
+              </div>
+              <div className="flex-1 bg-gray-100 p-6 overflow-auto flex items-center justify-center min-h-[500px]">
+                {supportPreviewUrl && isImage ? (
+                  <img src={supportPreviewUrl} alt="Document Preview" className="max-w-full rounded shadow-sm border border-gray-200 object-contain max-h-[70vh]" />
+                ) : supportPreviewUrl && isPdf ? (
+                  <iframe src={supportPreviewUrl} className="w-full h-[70vh] border border-gray-200 rounded shadow-sm bg-white" title="Document Preview" />
+                ) : (
+                  <div className="bg-white p-8 shadow-sm text-center w-full max-w-2xl min-h-[600px] border border-gray-200 flex flex-col items-center justify-center rounded-lg">
+                    <FileText className="h-16 w-16 text-gray-300 mb-4" />
+                    <p className="text-gray-500 text-lg font-medium">Document Preview</p>
+                    <p className="text-gray-400 text-sm mt-2">({selectedSupportingDoc.name})</p>
+                    <p className="text-gray-400 text-xs mt-1 mb-4">Preview not available for this file type.</p>
+                    {supportPreviewUrl && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const link = document.createElement('a');
+                          link.href = supportPreviewUrl;
+                          link.download = selectedSupportingDoc.name;
+                          document.body.appendChild(link);
+                          link.click();
+                          document.body.removeChild(link);
+                        }}
+                        className="flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-md bg-green-600 hover:bg-green-700 text-white shadow-sm transition-colors"
+                      >
+                        Download Document
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {showConsentDocumentPopup && consentFile && (
         <div className="fixed inset-0 z-[999] flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm animate-in fade-in duration-200">
@@ -377,7 +504,7 @@ export function Step1ConsentDocs() {
                           <td className="px-4 py-4 text-sm text-gray-500 w-1/3 break-words max-w-[200px]">{doc.description}</td>
                           <td className="px-4 py-4 text-right w-1/3">
                             <div className="flex items-center justify-end gap-3">
-                              <button type="button" onClick={() => { setSelectedSupportingDoc(doc); setShowSupportingDocPopup(true); }} className="flex items-center gap-1.5 rounded-md border border-green-300 px-3 py-1.5 text-xs font-semibold text-green-600 bg-green-50/50 hover:bg-green-100 transition-colors">
+                              <button type="button" onClick={() => handleViewDoc(doc)} className="flex items-center gap-1.5 rounded-md border border-green-300 px-3 py-1.5 text-xs font-semibold text-green-600 bg-green-50/50 hover:bg-green-100 transition-colors">
                                 <Eye className="h-4 w-4" /> View
                               </button>
                               <button type="button" onClick={() => handleRemoveSupportingDoc(doc.id)} className="flex items-center justify-center rounded-md border border-red-300 p-1.5 text-red-500 bg-red-50/50 hover:bg-red-100 transition-colors shrink-0">

@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Loader2, ArrowLeft, Check } from 'lucide-react';
-import { useSelector, useDispatch } from 'react-redux';
-import { selectLoanCurrentStep, setStep, resetForm } from '@/features/new-loan/store/newLoanFormSlice';
+import { useSelector } from 'react-redux';
+import { useAppDispatch } from '@/store/hooks';
+import { selectLoanCurrentStep, selectLoanFormState, setStepAPI, fetchLoanApplicationAPI } from '@/features/new-loan/store/newLoanFormSlice';
 import { NewLoanProgressBar } from './NewLoanProgressBar';
 import { Step1ConsentDocs } from './Step1ConsentDocs';
 import { Step2FarmerDetails } from './Step2FarmerDetails';
@@ -14,19 +15,29 @@ const STEP_META = [
   { title: 'Review Application', subtitle: "Please review all information before final submission. Resolve any warnings or missing info." },
 ];
 
-export function NewLoanOrchestrator() {
+export function NewLoanOrchestrator({ leadId }: { leadId?: string }) {
+  const [isMounted, setIsMounted] = useState(false);
   const currentStep = useSelector(selectLoanCurrentStep);
-  const dispatch = useDispatch();
+  const { applicationId, loadingStates } = useSelector(selectLoanFormState);
+  const dispatch = useAppDispatch();
   // For step 4, we keep the Step 3 metadata
   const meta = STEP_META[currentStep > 3 ? 2 : currentStep - 1] || STEP_META[0];
 
   const [isSaving, setIsSaving] = useState(false);
 
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isMounted || !leadId) return;
+    dispatch(fetchLoanApplicationAPI(leadId));
+  }, [isMounted, leadId, dispatch]);
+
   const handleSaveDraft = () => {
     setIsSaving(true);
     setTimeout(() => setIsSaving(false), 1000);
   };
-
 
   // Optional: Reset form on unmount to prevent stale data
   useEffect(() => {
@@ -34,6 +45,31 @@ export function NewLoanOrchestrator() {
       // dispatch(resetForm());
     };
   }, [dispatch]);
+
+  // Prevent hydration mismatch by rendering a loading state on first render
+  // or before Redux is fully synced with localStorage on the client.
+  if (!isMounted || loadingStates.fetchApp) {
+    return (
+      <div className="flex flex-col h-64 items-center justify-center text-center">
+        <Loader2 className="h-8 w-8 animate-spin text-gray-400 mb-4 mx-auto" />
+        <h3 className="text-lg font-medium text-gray-900">Loading Application...</h3>
+      </div>
+    );
+  }
+
+  if (!applicationId) {
+    return (
+      <div className="flex flex-col h-64 items-center justify-center text-center">
+        <div className="text-gray-400 mb-2">
+          <Check className="h-10 w-10 mx-auto" />
+        </div>
+        <h3 className="text-lg font-medium text-gray-900">Application Not Initialized</h3>
+        <p className="text-gray-500 max-w-md mx-auto mt-2 text-sm">
+          You must start the application from the Lead Dashboard to properly initialize the draft and obtain an Application ID.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto max-w-full space-y-6 pb-4 font-semibold">
@@ -43,7 +79,7 @@ export function NewLoanOrchestrator() {
           <button
             onClick={() => {
               if (currentStep > 1) {
-                dispatch(setStep(currentStep - 1));
+                dispatch(setStepAPI(currentStep - 1));
               } else {
                 window.history.back();
               }
