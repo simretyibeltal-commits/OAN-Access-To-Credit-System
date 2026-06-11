@@ -76,28 +76,28 @@ export default function Login() {
     <div className="relative flex min-h-screen flex-col items-center bg-[linear-gradient(0deg,#F9FAFB,#F9FAFB),#FFFFFF] font-sans">
       <header className="sticky top-0 w-full z-50">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-white px-4 sm:px-6 py-4 sm:py-0 h-auto sm:h-[80px] border-b border-[#D4D4D4] shadow-[0px_4px_20px_rgba(0,0,0,0.05)] gap-4 sm:gap-0">
-          <div className="flex items-center gap-1 sm:gap-1">
+          <div className="flex items-center gap-3 sm:gap-3">
             <img
               src="/logo.png"
               alt="Ethiopia OpenAgriNet Logo"
-              className="h-[40px] sm:h-[48px] w-auto shrink-0"
+              className="h-[32px] sm:h-[40px] w-auto shrink-0"
             />
             <div className="flex flex-col">
               <span className="font-semibold text-[#16335A] text-[14px] sm:text-[16px] leading-[14px] sm:leading-[16px]">Ethiopia OpenAgriNet</span>
-              <span className="font-normal mt-[2px] sm:mt-[4px] uppercase text-[#65768E] text-[10px] sm:text-[12px] leading-[12px] tracking-[1px]">Access to Credit</span>
+              <span className="font-normal mt-[2px] sm:mt-[3px] uppercase text-[#65768E] text-[10px] sm:text-[12px] leading-[12px] tracking-[1px]">Access to Credit</span>
             </div>
           </div>
 
           <div className="flex items-center gap-4 sm:gap-4 w-full sm:w-auto justify-between sm:justify-start" aria-label="Header actions">
             <button
-              className="inline-flex items-center justify-center gap-2 font-medium transition-colors duration-200 ease-out rounded-lg h-[44px] min-w-0 flex-1 sm:flex-none px-3 py-2 sm:px-5 sm:py-[10px] text-[14px] sm:text-[16px] sm:leading-[24px] bg-[#16A34A] text-white shadow-[0px_1px_2px_rgba(0,0,0,0.05)] hover:bg-[#10883c] focus-visible:outline-2 focus-visible:outline-[rgba(3,164,79,0.22)] focus-visible:outline-offset-2"
+              className="inline-flex items-center justify-center gap-2 font-medium transition-colors duration-200 ease-out rounded-lg h-[48px] min-w-0 flex-1 sm:flex-none px-3 py-2 sm:px-5 sm:py-[10px] text-[14px] sm:text-[16px] sm:leading-[24px] bg-[#16A34A] text-white shadow-[0px_1px_2px_rgba(0,0,0,0.05)] hover:bg-[#10883c] focus-visible:outline-2 focus-visible:outline-[rgba(3,164,79,0.22)] focus-visible:outline-offset-2"
               type="button"
               aria-pressed={true}
             >
               Login
             </button>
             <button
-              className="inline-flex items-center justify-center gap-2 font-medium transition-colors duration-200 ease-out rounded-lg h-[44px] min-w-0 flex-1 sm:flex-none px-3 py-2 sm:px-5 sm:py-[10px] text-[14px] sm:text-[16px] sm:leading-[24px] bg-white border border-[#E9E9E9] text-[#16335A] shadow-[0px_4px_6px_-1px_rgba(0,0,0,0.1),0px_2px_4px_-2px_rgba(0,0,0,0.1)] hover:bg-[#f9fafb] focus-visible:outline-2 focus-visible:outline-[rgba(3,164,79,0.22)] focus-visible:outline-offset-2"
+              className="inline-flex items-center justify-center gap-2 font-medium transition-colors duration-200 ease-out rounded-lg h-[48px] min-w-0 flex-1 sm:flex-none px-3 py-2 sm:px-5 sm:py-[10px] text-[14px] sm:text-[16px] sm:leading-[24px] bg-white border border-[#E9E9E9] text-[#16335A] shadow-[0px_4px_6px_-1px_rgba(0,0,0,0.1),0px_2px_4px_-2px_rgba(0,0,0,0.1)] hover:bg-[#f9fafb] focus-visible:outline-2 focus-visible:outline-[rgba(3,164,79,0.22)] focus-visible:outline-offset-2"
               type="button"
               aria-pressed={false}
             >
@@ -113,15 +113,15 @@ export default function Login() {
           <div className="flex overflow-hidden bg-white w-full max-w-2xl lg:max-w-[1152px] lg:w-full h-auto lg:h-[700px] lg:min-h-[700px] shadow-[0px_25px_50px_-12px_rgba(0,0,0,0.25)] rounded-[16px] flex-col lg:flex-row min-h-0 mx-auto">
             <div className="flex flex-col justify-between isolate relative w-full lg:w-1/2 p-6 sm:p-8 lg:p-12 min-h-auto bg-[linear-gradient(180deg,var(--panel-bg)_0%,var(--panel-bg-deep)_100%)]">
               <div className="relative z-10">
-                <div className="flex items-center gap-0 mb-8 sm:mb-10">
+                <div className="flex items-center gap-3 mb-8 sm:mb-10">
                   <img
                     src="/logo.png"
                     alt="Ethiopia OpenAgriNet Logo"
-                    className="h-[54px] sm:h-[64px] w-auto object-left shrink-0"
+                    className="h-[48px] sm:h-[64px] w-auto object-left shrink-0"
                   />
                   <div className="flex flex-col">
-                    <span className="font-semibold text-white text-[16px] sm:text-[16px] leading-tight tracking-wide">Ethiopia OpenAgriNet</span>
-                    <span className="text-[#E5E7EB] text-[10px] sm:text-[14px] font-normal leading-tight mt-1 tracking-widest">Access to Credit</span>
+                    <span className="font-semibold text-white text-[16px] sm:text-[20px] leading-tight tracking-wide">Ethiopia OpenAgriNet</span>
+                    <span className="text-[#E5E7EB] text-[12px] sm:text-[14px] font-normal leading-tight mt-1 tracking-widest">Access to Credit</span>
                   </div>
                 </div>
 
@@ -293,18 +293,18 @@ export default function Login() {
                     </span>
                   </label>
 
-                  <div className="mt-6 flex items-center justify-between gap-2 font-semibold">
-                    <label className="inline-flex cursor-pointer select-none items-center gap-3 text-slate-700">
-                      <input type="checkbox" className="w-6 h-6 cursor-pointer rounded border-gray-300 text-[#16A34A] focus:ring-[#16A34A] accent-[#16A34A]" />
-                      <span className="text-[14px]">Remember me</span>
+                  <div className="mt-6 flex items-center justify-between gap-2 text-[0.84rem] font-bold">
+                    <label className="inline-flex cursor-pointer select-none items-center gap-2 text-slate-700">
+                      <input type="checkbox" />
+                      <span>Remember me</span>
                     </label>
 
                     <button
                       type="button"
-                      className="font-semibold text-[#16335A] text-[14px] hover:underline bg-transparent border-none p-0 cursor-pointer text-left"
+                      className="font-semibold text-[#16335A] hover:underline bg-transparent border-none p-0 cursor-pointer text-left"
                       onClick={() => setIsTroubleModalOpen(true)}
                     >
-                      <span className='text-[14px]'>Having trouble?</span>
+                      Having trouble?
                     </button>
                   </div>
 
@@ -314,8 +314,8 @@ export default function Login() {
                     </p>
                   )}
 
-                  <button className="flex items-center justify-center rounded-lg font-bold text-white transition-colors duration-200 mt-2 w-full h-[56px] bg-[#16A34A] shadow-[0px_1px_2px_rgba(0,0,0,0.05)] text-[14px] hover:bg-[#10883c] disabled:opacity-70 disabled:cursor-not-allowed font-semibold" type="submit" disabled={isLoading}>
-                    <span className='font-semibold'>{isLoading ? 'Signing in…' : 'Sign In'}</span>
+                  <button className="flex items-center justify-center rounded-lg font-bold text-white transition-colors duration-200 mt-2 w-full h-[56px] bg-[#16A34A] shadow-[0px_1px_2px_rgba(0,0,0,0.05)] text-[14px] hover:bg-[#10883c] disabled:opacity-70 disabled:cursor-not-allowed" type="submit" disabled={isLoading}>
+                    {isLoading ? 'Signing in…' : 'Sign In'}
                   </button>
 
                   <p className="border-t border-[#D4D4D4] mt-2 pt-6 flex justify-center text-[14px]">
@@ -328,9 +328,9 @@ export default function Login() {
         </section>
       </main>
 
-      <HavingTroubleModal
-        isOpen={isTroubleModalOpen}
-        onClose={() => setIsTroubleModalOpen(false)}
+      <HavingTroubleModal 
+        isOpen={isTroubleModalOpen} 
+        onClose={() => setIsTroubleModalOpen(false)} 
       />
     </div >
   );
