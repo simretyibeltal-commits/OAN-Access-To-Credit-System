@@ -7,6 +7,7 @@ import { VisitHistoryCard } from '@/features/new-lead/components/VisitHistoryCar
 import LeadContextBanner from '@/features/new-lead/components/LeadContextBanner';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { fetchLeadDetailsThunk, fetchVisitSchedulesThunk, selectNewLeadState } from '@/features/new-lead/store/newLeadSlice';
+import { ScheduleVisitBanner } from '@/features/new-lead/components/ScheduleVisitBanner';
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -26,23 +27,13 @@ export default function ScheduleVisitPage({ params }: PageProps) {
 
   const { farmerDetails, leadStatus } = useAppSelector(selectNewLeadState);
 
-  const titleBanner = (
-    <LeadContextBanner
-      leadId={`#${leadId}`}
-      actionType="visit-scheduled"
-      farmerName={farmerDetails?.firstName ? farmerDetails.firstName + ' ' + farmerDetails.lastName : undefined}
-      location={farmerDetails?.location || undefined}
-      phoneNumber={farmerDetails?.phoneNumber || undefined}
-      status={leadStatus || undefined}
-    />
-  );
 
   const sidebar = (
     <VisitHistoryCard />
   );
 
   return (
-    <LeadLayoutGrid titleBanner={titleBanner} sidebar={sidebar} isViewMode={true}>
+    <LeadLayoutGrid titleBanner={<ScheduleVisitBanner />} sidebar={sidebar} isViewMode={true}>
       <ScheduleNewVisitForm />
     </LeadLayoutGrid>
   );

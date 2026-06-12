@@ -195,7 +195,7 @@ export default function LeadsDashboard() {
         <div className="flex flex-wrap items-center gap-3 font-semibold w-full md:w-auto mt-2 md:mt-0">
           <button
             type="button"
-            className="flex-1 md:flex-none inline-flex items-center justify-center gap-2 rounded-xl border border-border-subtle bg-white px-5 py-2.5 text-base font-medium text-text-primary transition hover:bg-slate-50 active:scale-95"
+            className="flex-1 md:flex-none inline-flex items-center justify-center gap-2 rounded-xl border border-border-subtle bg-white px-5 py-3 text-base font-medium text-text-primary transition hover:bg-slate-50 active:scale-95"
           >
             <Download size={18} />
             Export CSV
@@ -203,7 +203,7 @@ export default function LeadsDashboard() {
           <button
             type="button"
             onClick={() => router.push('/leads/new')}
-            className="flex-1 md:flex-none inline-flex items-center justify-center gap-2 rounded-xl bg-green-600 px-5 py-2.5 text-base font-semibold text-white transition hover:bg-green-700 active:scale-95"
+            className="flex-1 md:flex-none inline-flex items-center justify-center gap-2 rounded-xl bg-green-600 px-5 py-3 text-base font-semibold text-white transition hover:bg-green-700 active:scale-95"
           >
             <Plus size={18} strokeWidth={2.5} />
             Create New Lead

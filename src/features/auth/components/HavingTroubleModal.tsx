@@ -60,7 +60,7 @@ export function HavingTroubleModal({ isOpen, onClose }: HavingTroubleModalProps)
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4 animate-in fade-in duration-200">
-      <div
+      <div 
         className="relative w-full max-w-[448px] rounded-[16px] bg-white p-6 sm:p-8 shadow-2xl animate-in zoom-in-95 duration-200"
         role="dialog"
         aria-modal="true"
@@ -117,7 +117,7 @@ export function HavingTroubleModal({ isOpen, onClose }: HavingTroubleModalProps)
                 <button
                   type="submit"
                   disabled={isSubmitting || !inputValue.trim()}
-                  className="w-full sm:w-auto sm:min-w-[140px] h-[40px] rounded-lg bg-[#16A34A] text-white font-medium text-[14px] transition-colors hover:bg-[#10883c] px-6"
+                  className="w-full sm:w-auto sm:min-w-[140px] h-[40px] rounded-lg bg-[#16A34A] text-white font-medium text-[14px] transition-colors hover:bg-[#10883c] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#16A34A] disabled:opacity-70 disabled:cursor-not-allowed"
                 >
                   {isSubmitting ? 'Sending...' : 'Send Recovery Link'}
                 </button>
