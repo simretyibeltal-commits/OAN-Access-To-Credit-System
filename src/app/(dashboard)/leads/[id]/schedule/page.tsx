@@ -19,7 +19,7 @@ export default async function ScheduleVisitPage({ params }: { params: Promise<{ 
   );
 
   return (
-    <LeadLayoutGrid titleBanner={titleBanner} sidebar={sidebar}>
+    <LeadLayoutGrid titleBanner={titleBanner} sidebar={sidebar} isViewMode={true}>
       <ScheduleNewVisitForm />
     </LeadLayoutGrid>
   );
