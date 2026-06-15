@@ -5,17 +5,17 @@ import { X, CheckCircle2 } from 'lucide-react';
 interface ConsentDetailsModalProps {
   isOpen: boolean;
   onClose: () => void;
+  requestedDataFields?: { field_name: string; field_value: string }[];
+  purpose?: string;
+  validityFrom?: string;
+  validityTo?: string;
 }
 
-const CONSENT_DATA_ITEMS = [
-  'Basic Profile',
-  'Land Information',
-  'Crop and Livestock Information',
-  'Socio Economic Information',
-  'Agronomic Data',
-];
-
-export function ConsentDetailsModal({ isOpen, onClose }: ConsentDetailsModalProps) {
+export function ConsentDetailsModal({ 
+  isOpen, 
+  onClose,
+  requestedDataFields,
+}: ConsentDetailsModalProps) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -48,14 +48,14 @@ export function ConsentDetailsModal({ isOpen, onClose }: ConsentDetailsModalProp
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {CONSENT_DATA_ITEMS.map((item, index) => (
+            {(requestedDataFields || []).map((item, index) => (
               <div 
                 key={index} 
                 className="flex items-center p-4 gap-3 bg-[#F0FDFA] border border-[#A7F3D0] rounded-lg"
               >
                 <CheckCircle2 size={24} className="text-[#10B981] shrink-0" fill="#10B981" color="white" />
                 <span className="font-inter font-medium text-[15px] text-[#374151]">
-                  {item}
+                  {item.field_value}
                 </span>
               </div>
             ))}

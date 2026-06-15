@@ -9,6 +9,12 @@ export interface FarmerDetails {
   phoneNumber: string;
   email: string;
   gender?: string;
+  websub_delivered_at?: string;
+  consent_type?: string;
+  purpose?: string;
+  validity_from?: string;
+  validity_to?: string;
+  requested_data_fields?: { field_name: string; field_value: string }[];
 }
 
 export interface CreateLeadPayload {
@@ -170,6 +176,12 @@ export interface BasicProfileBackendData {
   email: string | null;
   location: string | null;
   gender?: string | null;
+  websub_delivered_at?: string | null;
+  consent_type?: string;
+  purpose?: string;
+  validity_from?: string;
+  validity_to?: string;
+  requested_data_fields?: { field_name: string; field_value: string }[];
 }
 
 const cleanId = (id: string): string => normalizeLeadId(id);
@@ -180,15 +192,15 @@ export const newLeadService = {
       method: 'POST',
       body: JSON.stringify({ fayda_id: faydaId }),
     }) as ApiResponse<SearchFarmerBackendData | null>;
-    
+
     const payload = response.data;
     if (!payload) {
       throw new Error(`Farmer with Fayda ID '${faydaId}' not found.`);
     }
-    
+
     const statusVal = payload.status;
     const farmerObj = payload.farmer || payload;
-    
+
     if (statusVal === 'success' || payload.farmer || farmerObj.name) {
       const nameParts = (farmerObj.name ?? '').split(' ');
       return {
@@ -238,10 +250,10 @@ export const newLeadService = {
   // Fetch full details of a lead (farmer details, etc.)
   async getLeadDetails(leadId: string): Promise<FarmerDetails> {
     const cleanLeadId = cleanId(leadId);
-    const response = await fetchApi(`oan_a2c.api.v1.loan_applications.get_basic_profile?lead_id=${cleanLeadId}`) as ApiResponse<
+    const response = await fetchApi(`oan_a2c.api.v1.loan_applications.get_basic_profile?lead_id=${cleanLeadId}&include_consent_data=1`) as ApiResponse<
       BasicProfileBackendData | null
     >;
-    
+
     const lead = response.data;
     if (!lead) {
       return {
@@ -253,14 +265,20 @@ export const newLeadService = {
         gender: ''
       };
     }
-    
+
     return {
       firstName: lead.first_name,
       lastName: lead.last_name,
       phoneNumber: lead.phone_number,
       location: lead.location ?? '',
       email: lead.email ?? '',
-      gender: lead.gender ?? ''
+      gender: lead.gender ?? '',
+      websub_delivered_at: lead.websub_delivered_at ?? '',
+      consent_type: lead.consent_type ?? '',
+      purpose: lead.purpose ?? '',
+      validity_from: lead.validity_from ?? '',
+      validity_to: lead.validity_to ?? '',
+      requested_data_fields: lead.requested_data_fields ?? []
     };
   },
 
@@ -277,7 +295,7 @@ export const newLeadService = {
       assigned_to?: string;
     }>>;
     const rawResults = response.data || [];
-    
+
     return rawResults.map((lead) => ({
       lead_id: lead.name || lead.lead_id || lead.id || '',
       status: lead.status || '',

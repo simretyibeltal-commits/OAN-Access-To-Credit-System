@@ -266,6 +266,10 @@ export function ConsentManagementSection() {
       <ConsentDetailsModal
         isOpen={isConsentModalOpen}
         onClose={() => setIsConsentModalOpen(false)}
+        requestedDataFields={farmerDetails?.requested_data_fields ?? []}
+        purpose={farmerDetails?.purpose ?? ''}
+        validityFrom={farmerDetails?.validity_from ?? ''}
+        validityTo={farmerDetails?.validity_to ?? ''}
       />
     </section>
   );
