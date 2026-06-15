@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, ChangeEvent } from 'react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { selectNewLeadState, setFarmerId, searchFarmerThunk, searchFarmerConsent, fetchLeadDetailsThunk } from '../store/newLeadSlice';
+import { selectFarmerState, setFarmerId, searchFarmerThunk, } from '../store/farmerSlice';
+import { selectConsentState, searchFarmerConsent } from '../store/consentSlice';
 import { selectOfficerName } from '@/features/auth/store/authSlice';
 import { newLeadService } from '../api/newLead.service';
 import { OTPVerificationModal } from './modals/OTPVerificationModal';
@@ -10,7 +11,8 @@ import { useParams } from 'next/navigation';
 
 export function ConsentManagementSection() {
   const dispatch = useAppDispatch();
-  const { farmerId, isLoadingConsent, isSearchingFarmer, searchedFarmer, consentError, isOtpVerified, consentDate, consentRequestId, farmerDetails } = useAppSelector(selectNewLeadState);
+  const { farmerId, isSearchingFarmer, searchedFarmer, farmerDetails } = useAppSelector(selectFarmerState);
+  const { isLoadingConsent, consentError, isOtpVerified, consentDate, consentRequestId } = useAppSelector(selectConsentState);
   const officerName = useAppSelector(selectOfficerName) || 'AgriBank';
   const params = useParams();
   const leadId = params?.id as string;
@@ -264,6 +266,10 @@ export function ConsentManagementSection() {
       <ConsentDetailsModal
         isOpen={isConsentModalOpen}
         onClose={() => setIsConsentModalOpen(false)}
+        requestedDataFields={farmerDetails?.requested_data_fields ?? []}
+        purpose={farmerDetails?.purpose ?? ''}
+        validityFrom={farmerDetails?.validity_from ?? ''}
+        validityTo={farmerDetails?.validity_to ?? ''}
       />
     </section>
   );

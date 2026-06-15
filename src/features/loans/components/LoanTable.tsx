@@ -10,6 +10,7 @@ import {
   setTableTypeFilters,
 } from '../store/loanDashboardSlice';
 import LoanEmptyState from './LoanEmptyState';
+import { selectLeadStatusesOptions, selectLoanTypesOptions } from '@/features/new-lead/store/newLeadSlice';
 
 export interface LoanTableRow {
   id: string;
@@ -29,19 +30,12 @@ interface LoanTableProps {
   onView?: (row: LoanTableRow) => void;
 }
 
-const STATUS_OPTIONS = ['Processing', 'Granted', 'Rejected'];
-const LOAN_TYPE_OPTIONS = [
-  'Input loan (seeds, agrochemicals)',
-  'Agricultural term loan',
-  'Smallholder short-term loan',
-  'Land loan',
-  'Farm equipment loan',
-  'Smallholder farmer direct loan'
-];
-
 const LoanTable = memo(({ onView }: LoanTableProps) => {
   const dispatch = useAppDispatch();
   const rows: LoanTableRow[] = useAppSelector(selectPagedRows);
+
+  const statusOptions = useAppSelector(selectLeadStatusesOptions);
+  const loanTypeOptions = useAppSelector(selectLoanTypesOptions);
 
   const [statusFilterOpen, setStatusFilterOpen] = useState(false);
   const [loanTypeFilterOpen, setLoanTypeFilterOpen] = useState(false);
@@ -144,10 +138,10 @@ const LoanTable = memo(({ onView }: LoanTableProps) => {
                       <Filter size={16} className="text-emerald-600" /> FILTER BY STATUS
                     </div>
                     <div className="flex flex-col max-h-[300px] overflow-y-auto font-medium [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-                      {STATUS_OPTIONS.map((opt, idx) => {
+                      {statusOptions.map((opt, idx) => {
                         const isChecked = localStatuses.includes(opt);
                         return (
-                          <button key={opt} type="button" onClick={() => toggleLocalStatus(opt)} className={`flex items-center gap-4 px-5 py-3 text-[15px] font-medium transition-colors hover:bg-gray-50 text-[#4B5563] text-left ${idx !== STATUS_OPTIONS.length - 1 ? 'border-b border-[#F3F3F3]' : ''}`}>
+                          <button key={opt} type="button" onClick={() => toggleLocalStatus(opt)} className={`flex items-center gap-4 px-5 py-3 text-[15px] font-medium transition-colors hover:bg-gray-50 text-[#4B5563] text-left ${idx !== statusOptions.length - 1 ? 'border-b border-[#F3F3F3]' : ''}`}>
                             <span className={`inline-flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-[2px] border transition-all duration-200 ease-in-out rounded-sm ${isChecked ? 'border-[#16A34A] bg-[#16A34A] text-white' : 'border-[#9CA3AF] bg-white'}`}>
                               <Check size={12} strokeWidth={3} className={`transition-all duration-200 ease-in-out rounded-sm  ${isChecked ? 'scale-100 opacity-100' : 'scale-50 opacity-0 rounded-sm'}`} />
                             </span>
@@ -184,10 +178,10 @@ const LoanTable = memo(({ onView }: LoanTableProps) => {
                       <Filter size={16} className="text-emerald-600" /> FILTER BY LOAN TYPE
                     </div>
                     <div className="flex flex-col max-h-[300px] overflow-y-auto font-medium [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-                      {LOAN_TYPE_OPTIONS.map((opt, idx) => {
+                      {loanTypeOptions.map((opt, idx) => {
                         const isChecked = localLoanTypes.includes(opt);
                         return (
-                          <button key={opt} type="button" onClick={() => toggleLocalLoanType(opt)} className={`flex items-center gap-4 px-5 py-3 text-[15px] font-medium transition-colors hover:bg-gray-50 text-[#4B5563] text-left ${idx !== LOAN_TYPE_OPTIONS.length - 1 ? 'border-b border-[#F3F3F3]' : ''}`}>
+                          <button key={opt} type="button" onClick={() => toggleLocalLoanType(opt)} className={`flex items-center gap-4 px-5 py-3 text-[15px] font-medium transition-colors hover:bg-gray-50 text-[#4B5563] text-left ${idx !== loanTypeOptions.length - 1 ? 'border-b border-[#F3F3F3]' : ''}`}>
                             <span className={`inline-flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-[2px] border transition-all duration-200 ease-in-out rounded-sm ${isChecked ? 'border-[#16A34A] bg-[#16A34A] text-white' : 'border-[#9CA3AF] bg-white'}`}>
                               <Check size={12} strokeWidth={3} className={`transition-all duration-200 ease-in-out rounded-sm  ${isChecked ? 'scale-100 opacity-100' : 'scale-50 opacity-0 rounded-sm'}`} />
                             </span>

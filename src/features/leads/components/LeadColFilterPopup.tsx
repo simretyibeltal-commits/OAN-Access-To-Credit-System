@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { ChevronDown, Check, Filter } from 'lucide-react';
 import { useAppSelector } from '@/store/hooks';
-import { selectNewLeadState } from '@/features/new-lead/store/newLeadSlice';
+import { selectLoanTypesOptions, selectLeadStatusesOptions } from '@/features/new-lead/store/newLeadSlice';
 
 
 /* ─── LeadColFilterPopup ────────────────────────────────────────────── */
@@ -35,20 +35,13 @@ export function LeadColFilterPopup({ col, anchorRef, initialSelected = [], onApp
   }, [anchorRef, onClose]);
 
 
-  const STATUS_OPTIONS = ['Active', 'Verified', 'Processed', 'Rejected', 'Dormant'];
-  const LOAN_TYPE_OPTIONS = [
-    'Input loan (seeds, agrochemicals)',
-    'Agricultural term loan',
-    'Smallholder short-term loan',
-    'Land loan',
-    'Farm equipment loan',
-    'Smallholder farmer direct loan',
-  ];
+  const loanTypesOptions = useAppSelector(selectLoanTypesOptions);
+  const leadStatusesOptions = useAppSelector(selectLeadStatusesOptions);
 
   const opts = col === 'STATUS'
-    ? STATUS_OPTIONS
+    ? leadStatusesOptions.filter(o => o !== 'All')
     : col === 'LOAN TYPE'
-      ? LOAN_TYPE_OPTIONS
+      ? loanTypesOptions
       : [];
   const toggle = (v: string) => setSelected(p => p.includes(v) ? p.filter(x => x !== v) : [...p, v]);
 
