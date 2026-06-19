@@ -1,4 +1,5 @@
 "use client";
+import { logger } from '@/lib/logger';
 
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
@@ -11,6 +12,7 @@ import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { scheduleVisitThunk, selectVisitState } from '../..';
 import { useParams, useRouter } from 'next/navigation';
 import { normalizeLeadId } from '@/lib/utils';
+import { FeedbackModal } from '@/components/ui/FeedbackModal';
 
 interface ScheduleNewVisitFormProps {
   asModal?: boolean;
@@ -36,6 +38,7 @@ export const ScheduleNewVisitForm = ({
   const [woreda, setWoreda] = useState('');
   const [kebele, setKebele] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const [errorFeedback, setErrorFeedback] = useState<string | null>(null);
 
   const [mounted, setMounted] = useState(false);
   const dispatch = useAppDispatch();
@@ -61,7 +64,7 @@ export const ScheduleNewVisitForm = ({
 
   const handleSave = async () => {
     if (!date || !woreda) {
-      alert('Please fill in all required fields (Date, Woreda).');
+      setErrorFeedback('Please fill in all required fields (Date, Woreda).');
       return;
     }
 
@@ -74,7 +77,7 @@ export const ScheduleNewVisitForm = ({
       } else {
         const activeLeadId = params?.id as string;
         if (!activeLeadId) {
-          alert('Error: Lead ID not found');
+          setErrorFeedback('Lead ID not found');
           return;
         }
         await dispatch(scheduleVisitThunk({
@@ -85,8 +88,8 @@ export const ScheduleNewVisitForm = ({
         router.push(`/leads/${normalizeLeadId(activeLeadId)}`);
       }
     } catch (err: any) {
-      console.error("Failed to save schedule:", err);
-      alert(typeof err === 'string' ? err : err.message || 'Failed to save schedule');
+      logger.error("Failed to save schedule:", err);
+      setErrorFeedback(typeof err === 'string' ? err : err.message || 'Failed to save schedule');
     } finally {
       setIsSaving(false);
     }
@@ -211,6 +214,14 @@ export const ScheduleNewVisitForm = ({
           </button>
         </div>
       </div>
+
+      <FeedbackModal
+        isOpen={!!errorFeedback}
+        onClose={() => setErrorFeedback(null)}
+        type="error"
+        title="Error"
+        message={errorFeedback ?? ''}
+      />
     </>
   );
 

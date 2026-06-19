@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import type {
   Lead,
   GetLeadsParams,
@@ -12,7 +13,7 @@ import type {
 } from '@/features/leads/types/leads.types';
 
 export const leadService = {
-  async getLeads(params?: GetLeadsParams): Promise<GetLeadsResponse> {
+  async getLeads(params?: GetLeadsParams, signal?: AbortSignal): Promise<GetLeadsResponse> {
     const searchParams = new URLSearchParams({
       start: params?.start?.toString() || '0',
       page_length: params?.page_length?.toString() || '20',
@@ -35,9 +36,10 @@ export const leadService = {
     // TODO: [OAN-452] Temporary client-side join. We are fetching up to 2000 visit schedules because 
     // the backend get_leads API doesn't currently include the latest visit schedule details.
     // This should be removed once the backend includes latest_visit_schedule in the lead response.
+    const fetchInit = signal ? { signal } : {};
     const [response, schedulesRes] = await Promise.all([
-      fetch(`/api/proxy/api/method/oan_a2c.api.v1.leads.get_leads?${searchParams.toString()}`),
-      fetch(`/api/proxy/api/method/oan_a2c.api.v1.leads.get_visit_schedules?start=0&page_length=2000`)
+      fetch(`/api/proxy/api/method/oan_a2c.api.v1.leads.get_leads?${searchParams.toString()}`, fetchInit),
+      fetch(`/api/proxy/api/method/oan_a2c.api.v1.leads.get_visit_schedules?start=0&page_length=2000`, fetchInit)
     ]);
 
     if (!response.ok) {
@@ -69,7 +71,7 @@ export const leadService = {
         };
       }
     } catch (e) {
-      console.error('Failed to parse visit schedules', e);
+      logger.error('Failed to parse visit schedules', e);
     }
 
     const rawSchedules: VisitSchedule[] = schedulesData?.message?.data || [];

@@ -7,16 +7,18 @@ import {
   selectLeadStatus,
   selectFarmerState,
   selectVisitState,
+  selectConsentState,
   fetchLeadMetadataThunk,
   fetchLeadDetailsThunk,
   fetchVisitSchedulesThunk,
   fetchActivitiesThunk,
-  fetchSpecificLeadThunk
+  fetchLeadProfileThunk
 } from '@/features/new-lead';
 import { selectLeads } from '@/features/leads/store/leadSlice';
 import { useEffect } from 'react';
 import { LeadInfoSection } from '@/features/new-lead/components/LeadInfoSection';
 import { ConsentManagementSection } from '@/features/new-lead/components/ConsentManagementSection';
+import { ConsentFinalizationSection } from '@/features/new-lead/components/ConsentFinalizationSection';
 import { FarmerDetailsSection } from '@/features/new-lead/components/FarmerDetailsSection';
 import { CreditInformationSection } from '@/features/new-lead/components/CreditInformationSection';
 import { CallDetailsSection } from '@/features/new-lead/components/CallDetailsSection';
@@ -40,7 +42,7 @@ export function LeadDashboard({ id }: LeadDashboardProps) {
         if (id) {
             dispatch(fetchLeadDetailsThunk(id));
             dispatch(fetchVisitSchedulesThunk(id));
-            dispatch(fetchSpecificLeadThunk(id));
+            dispatch(fetchLeadProfileThunk(id));
             dispatch(fetchActivitiesThunk(id));
         }
     }, [dispatch, id]);
@@ -49,6 +51,7 @@ export function LeadDashboard({ id }: LeadDashboardProps) {
     const leadStatus = useAppSelector(selectLeadStatus);
     const { farmerDetails } = useAppSelector(selectFarmerState);
     const { visitSchedule } = useAppSelector(selectVisitState);
+    const { isOtpVerified, consentDate } = useAppSelector(selectConsentState);
 
     const currentLead = id ? leads.find(l => l.id.replace('#', '') === id.replace('#', '')) : null;
     const hasScheduledVisit = Boolean(currentLead?.visitDate) || Boolean(visitSchedule?.id);
@@ -92,6 +95,7 @@ export function LeadDashboard({ id }: LeadDashboardProps) {
         <LeadLayoutGrid titleBanner={titleBanner} sidebar={sidebar} isViewMode={Boolean(id)}>
             <LeadInfoSection />
             <ConsentManagementSection />
+            {isOtpVerified && !consentDate && <ConsentFinalizationSection />}
             <FarmerDetailsSection />
             <CreditInformationSection />
             <CallDetailsSection />

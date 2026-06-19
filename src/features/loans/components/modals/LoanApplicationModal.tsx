@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import { logger } from '@/lib/logger';
+import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { X, CheckCircle2, User, Lock, Building2, Loader2 } from 'lucide-react';
 import { LoanTableRow } from '../LoanTable';
-import { loanService } from '../../api/loan.service';
+import { loanService, LoanApplicationFull } from '../../api/loan.service';
 
 interface LoanApplicationModalProps {
   isOpen: boolean;
@@ -22,7 +23,7 @@ const Field = ({ label, value }: { label: string; value: string | null | undefin
 export default function LoanApplicationModal({ isOpen, onClose, data }: LoanApplicationModalProps) {
   const [mounted, setMounted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [fullProfile, setFullProfile] = useState<any>(null);
+  const [fullProfile, setFullProfile] = useState<LoanApplicationFull | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -38,7 +39,7 @@ export default function LoanApplicationModal({ isOpen, onClose, data }: LoanAppl
           setIsLoading(false);
         })
         .catch((err) => {
-          console.error("Failed to fetch full profile:", err);
+          logger.error("Failed to fetch full profile:", err);
           setIsLoading(false);
         });
     } else {
@@ -129,7 +130,7 @@ export default function LoanApplicationModal({ isOpen, onClose, data }: LoanAppl
                 <Field label="PRIMARY CROPS" value={fullProfile?.primary_crops || null} />
                 <Field label="CROP VARIETY" value={fullProfile?.crop_variety || null} />
                 <Field label="LAND SIZE" value={fullProfile?.farmland_size_hectares ? `${fullProfile.farmland_size_hectares} Hectares` : null} />
-                <Field label="EXPECTED YIELD" value={fullProfile?.expected_yield || null} />
+                <Field label="EXPECTED YIELD" value={fullProfile?.expected_yield != null ? String(fullProfile.expected_yield) : null} />
               </div>
             )}
           </section>

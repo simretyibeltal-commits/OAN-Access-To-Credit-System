@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { loginUser } from '../api/authApi';
+import { loginUser, getMe } from '../api/authApi';
 import type { RootState } from '../../../store';
 import type { User, AuthState } from '../types/auth.types';
 
@@ -22,6 +22,29 @@ export const loginThunk = createAsyncThunk<
       };
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Unknown Cause. Please Try Again Later';
+      return rejectWithValue(message);
+    }
+  },
+);
+
+export const getMeThunk = createAsyncThunk<
+  User,
+  void,
+  { rejectValue: string }
+>(
+  'auth/getMe',
+  async (_, { rejectWithValue }) => {
+    try {
+      const userData = await getMe();
+      return {
+        username: userData.email,
+        officerName: userData.full_name || '',
+        roles: Array.isArray(userData.roles) ? userData.roles : [],
+        mobileNo: null,
+        userType: null,
+      };
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to fetch current user session';
       return rejectWithValue(message);
     }
   },
@@ -63,6 +86,19 @@ const authSlice = createSlice({
       .addCase(loginThunk.rejected, (state, action) => {
         state.status = 'failed';
         state.error = (action.payload as string) ?? 'Something went wrong.';
+      })
+      .addCase(getMeThunk.pending, (state) => {
+        state.status = 'loading';
+        state.error = null;
+      })
+      .addCase(getMeThunk.fulfilled, (state, action: PayloadAction<User>) => {
+        state.status = 'succeeded';
+        state.user = action.payload;
+      })
+      .addCase(getMeThunk.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = (action.payload as string) ?? 'Session verification failed.';
+        state.user = null;
       });
   },
 });
@@ -75,4 +111,4 @@ export const selectAuthStatus = (state: RootState) => state.auth.status;
 export const selectAuthError = (state: RootState) => state.auth.error;
 export const selectIsAuthenticated = (state: RootState) => state.auth.user !== null;
 
-export default authSlice.reducer;
+export const authReducer = authSlice.reducer;

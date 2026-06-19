@@ -1,6 +1,7 @@
 import { fetchApi } from '@/lib/api/fetchApi';
 import { normalizeLeadId } from '@/lib/utils';
 import type { ApiResponse } from '@/types/api';
+import type { LoanFormData } from '../types/loans.types';
 
 export interface LoanApplication {
   id: string;
@@ -13,7 +14,7 @@ export interface LoanApplication {
   phone?: string;
   region?: string;
   loanTerm?: string;
-  formData?: any;
+  formData?: LoanFormData;
 }
 
 export interface LoanApplicationSummary {
@@ -26,23 +27,66 @@ export interface LoanApplicationSummary {
   location: string;
   phone_number: string;
   creation: string;
+  first_name?: string;
+  last_name?: string;
 }
 
 export interface LoanApplicationFull {
   application_id: string;
-  lead_id: string;
+  lead_id: string | null;
   status: 'Draft' | 'Processing' | 'Approved' | 'Rejected';
-  current_step: number | null;
-  farmer_profile: string;
+  current_step?: number | null;
+  farmer_profile?: string;
   phone_number: string;
-  location: string;
-  farmer_id: string;
-  consent_id: string;
+  location: string | null;
+  farmer_id: string | null;
+  consent_id: string | null;
   loan_type: string;
   loan_amount: number;
   loan_reason: string;
   loan_officer?: string;
-  [key: string]: unknown;
+  first_name?: string;
+  last_name?: string;
+  father_name?: string | null;
+  date_of_birth?: string | null;
+  gender?: string;
+  marital_status?: string;
+  education_level?: string;
+  national_id?: string | null;
+  woreda?: string | null;
+  kebele?: string | null;
+  purpose?: string | null;
+  duration?: string | null;
+  primary_crops?: string | null;
+  crop_variety?: string | null;
+  farmland_size_hectares?: number | null;
+  expected_yield?: number | string | null;
+  bank_account_no?: string | null;
+  ifsc_code?: string | null;
+  bank_name?: string | null;
+  account_holder?: string | null;
+  id_type?: string | null;
+  id_number?: string | null;
+  language?: string | null;
+  land_size?: number | string | null;
+  farm_id?: string | null;
+  farm_polygon?: string | null;
+  land_acreage?: number | string | null;
+  farm_land_number?: string | null;
+  size_of_family?: number | string | null;
+  number_of_children?: number | string | null;
+  no_of_females_family?: number | string | null;
+  no_of_males_family?: number | string | null;
+  family_member_owns_land_independently?: boolean | number | string | null;
+  source_of_income?: string | null;
+  total_farmland_size_as_landowner?: number | string | null;
+  total_farmland_size_as_crop_sharing?: number | string | null;
+  total_farmland_size_as_rented?: number | string | null;
+  certification_id?: string | null;
+  certification_photo_url?: string | null;
+  land_ownership_status?: string | null;
+  soil_fertility_minerals?: string | null;
+  moisture_levels?: string | null;
 }
 
 export interface LoanSummaryMetrics {
@@ -58,11 +102,13 @@ export interface LoanSummaryMetrics {
 }
 
 export interface SupportingDocument {
-  file_id: string;
+  name: string;
   file_name: string;
-  document_type: string;
+  file_url: string;
+  creation: string;
+  file_id?: string;
+  document_type?: string;
   is_verified?: boolean;
-  creation?: string;
   owner?: string;
 }
 

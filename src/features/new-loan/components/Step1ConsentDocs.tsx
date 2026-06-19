@@ -1,7 +1,10 @@
+'use client';
+
+import { logger } from '@/lib/logger';
 import React, { useState, useRef, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { nextStepAPI, uploadDocumentAPI, selectLoanFormState } from '@/features/new-loan/store/newLoanFormSlice';
-import { loanService } from '@/features/loans/api/loan.service';
+import { loanService, type SupportingDocument } from '@/features/loans/api/loan.service';
 import { ArrowRight, CheckCircle2, FileText, Loader2, FolderOpen, Eye, EyeOff, X, Check, ChevronDown, Info } from 'lucide-react';
 import type { AppDispatch } from '@/store';
 
@@ -51,7 +54,7 @@ export function Step1ConsentDocs() {
     loanService.listSupportingDocuments(appId)
       .then(res => {
         if (Array.isArray(res?.data)) {
-          const fetchedDocs = res.data.map((f: any) => ({
+          const fetchedDocs = res.data.map((f: SupportingDocument) => ({
             id: f.name,
             type: 'Uploaded Document',
             name: f.file_name,
@@ -60,7 +63,7 @@ export function Step1ConsentDocs() {
           setSupportingDocs(fetchedDocs);
         }
       })
-      .catch(err => console.error('Failed to fetch documents', err));
+      .catch(err => logger.error('Failed to fetch documents', err));
   };
 
   useEffect(() => {
@@ -94,48 +97,6 @@ export function Step1ConsentDocs() {
   const [consentProgress, setConsentProgress] = useState(0);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (consentFile) {
-      const url = URL.createObjectURL(consentFile);
-      setPreviewUrl(url);
-      return () => URL.revokeObjectURL(url);
-    } else {
-      setPreviewUrl(null);
-    }
-  }, [consentFile]);
-
-  const handleConsentUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0] && applicationId) {
-      const file = e.target.files[0];
-      setConsentFile(file);
-      setIsConsentUploading(true);
-      setConsentProgress(10); // initial fake progress while uploading
-
-      try {
-        await dispatch(uploadDocumentAPI({
-          application_id: applicationId,
-          document_type: 'Consent Form',
-          file: file
-        })).unwrap();
-        setConsentProgress(100);
-      } catch (err) {
-        console.error('Failed to upload consent form', err);
-        setConsentProgress(0);
-        setConsentFile(null);
-      } finally {
-        setIsConsentUploading(false);
-      }
-    }
-  };
-
-  const handleRemoveConsentFile = () => {
-    setConsentFile(null);
-    setConsentProgress(0);
-    if (consentFileRef.current) {
-      consentFileRef.current.value = '';
-    }
-  };
-
   const handleRemoveSupportingDoc = async (id: string | number) => {
     if (!applicationId) return;
     try {
@@ -146,13 +107,13 @@ export function Step1ConsentDocs() {
         if (isSuccess) {
           setSupportingDocs(docs => docs.filter(doc => doc.id !== id));
         } else {
-          console.error('Failed to delete document on server', res);
+          logger.error('Failed to delete document on server', res);
         }
       } else {
         setSupportingDocs(docs => docs.filter(doc => doc.id !== id));
       }
     } catch (err) {
-      console.error('Failed to delete supporting document:', err);
+      logger.error('Failed to delete supporting document:', err);
     }
   };
 
@@ -174,7 +135,7 @@ export function Step1ConsentDocs() {
       setNewDocDesc('');
       setNewDocFile(null);
     } catch (err) {
-      console.error('Failed to upload supporting document', err);
+      logger.error('Failed to upload supporting document', err);
     }
   };
 

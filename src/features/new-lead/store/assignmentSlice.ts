@@ -91,7 +91,7 @@ const assignmentSlice = createSlice({
 });
 
 export const { clearAssignmentState } = assignmentSlice.actions;
-export default assignmentSlice.reducer;
+export const assignmentReducer = assignmentSlice.reducer;
 
 export const selectAssignmentState = (state: RootState) => state.assignment;
 

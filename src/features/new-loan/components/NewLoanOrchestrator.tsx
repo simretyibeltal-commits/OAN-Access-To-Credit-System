@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useEffect, useState } from 'react';
 import { Loader2, ArrowLeft, Check } from 'lucide-react';
 import { useSelector } from 'react-redux';

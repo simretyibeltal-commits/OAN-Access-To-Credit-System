@@ -1,9 +1,13 @@
+import { logger } from '@/lib/logger';
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { loanService, type LoanApplicationSummary } from '@/features/loans/api/loan.service';
 import { newLeadService } from '@/features/new-lead/api/newLead.service';
 import { updateLeadStatusThunk } from '../../new-lead/store/newLeadSlice';
 import type { RootState } from '../../../store';
 import { normalizeLeadId } from '@/lib/utils';
+
+// Highest reachable form step (steps 1–3); step 4 is the post-submit success view.
+const MAX_FORM_STEP = 3;
 
 interface ConsentRequestData {
   consent_request: string;
@@ -54,7 +58,7 @@ const loadInitialState = (): LoanFormState => {
           supportingDocs: parsed.supportingDocs || []
         };
       } catch (e) {
-        console.error('Failed to parse saved loan form state');
+        logger.error('Failed to parse saved loan form state');
       }
     }
   }
@@ -114,8 +118,8 @@ export const createAndVerifyLoanApplicationThunk = createAsyncThunk<
 
       dispatch(setApplicationId(appId));
       return appId;
-    } catch (err: any) {
-      const msg = err?.message || (typeof err === 'string' ? err : 'Failed to create and verify loan application');
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : (typeof err === 'string' ? err : 'Failed to create and verify loan application');
       return rejectWithValue(msg);
     }
   }
@@ -143,7 +147,7 @@ export const nextStepAPI = createAsyncThunk<number, void, { state: RootState }>(
     const state = getState();
     const { currentStep, applicationId } = state.loanForm;
     const nextStepVal = currentStep + 1;
-    if (nextStepVal > 3) return currentStep;
+    if (nextStepVal > MAX_FORM_STEP) return currentStep;
 
     try {
       if (applicationId) {
@@ -203,11 +207,24 @@ export const sendOtpAPI = createAsyncThunk(
   }
 );
 
-export const verifyOtpAPI = createAsyncThunk(
+export const verifyOtpAPI = createAsyncThunk<
+  any,
+  { leadId?: string; otp_code: string },
+  { state: RootState }
+>(
   'loanForm/verifyOtp',
-  async (payload: { leadId?: string; otp_code: string }, { rejectWithValue }) => {
+  async (payload, { getState, rejectWithValue }) => {
     try {
-      const response = await newLeadService.verifyOtp(payload);
+      const state = getState();
+      const consentRequest = state.loanForm.consentRequestData?.consent_request;
+      if (!consentRequest) {
+        throw new Error('No active consent request found. Please request OTP again.');
+      }
+      const response = await newLeadService.verifyOtp({
+        ...(payload.leadId ? { leadId: payload.leadId } : {}),
+        consent_request: consentRequest,
+        otp_code: payload.otp_code
+      });
       return response;
     } catch (err) {
       return rejectWithValue(err instanceof Error ? err.message : 'Failed to verify OTP');
@@ -378,4 +395,4 @@ export const {
 export const selectLoanFormState = (state: RootState) => state.loanForm;
 export const selectLoanCurrentStep = (state: RootState) => state.loanForm.currentStep;
 
-export default newLoanFormSlice.reducer;
+export const loanFormReducer = newLoanFormSlice.reducer;
