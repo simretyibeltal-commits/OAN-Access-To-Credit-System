@@ -125,9 +125,18 @@ export const addActivityNoteThunk = createAsyncThunk<
   'newLead/addActivityNote',
   async (payload, { getState, rejectWithValue }) => {
     try {
-      const response = await newLeadService.addActivityNote(payload);
       const state = getState() as RootState;
       const officerName = state.auth?.user?.officerName || 'Current User';
+      const cleanLeadId = (payload.leadId || '').replace(/^#/, '');
+
+      if (cleanLeadId === 'new') {
+        const mockResponse: AddActivityNoteResponse = {
+          comment_id: `new-${Date.now()}`
+        };
+        return { response: mockResponse, content: payload.content, officerName };
+      }
+
+      const response = await newLeadService.addActivityNote(payload);
       return { response, content: payload.content, officerName };
     } catch (error) {
       return rejectWithValue(error instanceof Error ? error.message : 'Unknown Cause: Failed to add note');
@@ -135,11 +144,11 @@ export const addActivityNoteThunk = createAsyncThunk<
   }
 );
 
-export const fetchSpecificLeadThunk = createAsyncThunk<SpecificLeadAPI[], string>(
-  'newLead/fetchSpecificLead',
+export const fetchLeadProfileThunk = createAsyncThunk<SpecificLeadAPI[], string>(
+  'newLead/fetchLeadProfile',
   async (leadId: string, { dispatch, rejectWithValue }) => {
     try {
-      const leads = await newLeadService.getSpecificLead(leadId);
+      const leads = await newLeadService.getLeadProfile(leadId);
       if (leads.length > 0) {
         const lead = leads[0];
         if (lead && lead.assigned_to) {
@@ -148,7 +157,7 @@ export const fetchSpecificLeadThunk = createAsyncThunk<SpecificLeadAPI[], string
       }
       return leads;
     } catch (error) {
-      return rejectWithValue(error instanceof Error ? error.message : 'Unknown Cause: Failed to fetch specific lead');
+      return rejectWithValue(error instanceof Error ? error.message : 'Unknown Cause: Failed to fetch lead profile');
     }
   }
 );
@@ -243,7 +252,7 @@ const newLeadSlice = createSlice({
     },
     addCreditInfo(state, action: PayloadAction<Omit<CreditInfo, 'id'>>) {
       const newCreditInfo: CreditInfo = {
-        id: `CI-${Math.floor(Math.random() * 10000)}`,
+        id: `CI-${crypto.randomUUID()}`,
         ...action.payload
       };
       state.creditInfo.push(newCreditInfo);
@@ -302,7 +311,7 @@ const newLeadSlice = createSlice({
           purpose: item.purpose_message || ''
         }));
       })
-      .addCase(fetchSpecificLeadThunk.fulfilled, (state, action) => {
+      .addCase(fetchLeadProfileThunk.fulfilled, (state, action) => {
         const leads = action.payload;
         if (leads.length > 0) {
           const lead = leads[0];
@@ -315,7 +324,7 @@ const newLeadSlice = createSlice({
       .addCase(addCreditInfoThunk.fulfilled, (state, action) => {
         const { payload } = action.payload;
         state.creditInfo.push({
-          id: `cr-${Date.now()}`,
+          id: `cr-${crypto.randomUUID()}`,
           type: payload.loan_type,
           amount: String(payload.loan_amount),
           purpose: payload.purpose_message || ''
@@ -328,6 +337,7 @@ const newLeadSlice = createSlice({
           id: response.comment_id || response.message?.name || `new-${Date.now()}`,
           author: 'Current User',
           type: 'Commented',
+          title: 'Agent Note',
           content: content || '',
           timestamp: formatTiming(new Date().toISOString(), ' - ', false)
         });
@@ -373,4 +383,4 @@ export const selectIsLeadFinalized = (state: RootState) => {
   return ['rejected', 'processed', 'granted'].includes(status);
 };
 
-export default newLeadSlice.reducer;
+export const newLeadReducer = newLeadSlice.reducer;

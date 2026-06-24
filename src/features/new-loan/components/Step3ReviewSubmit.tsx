@@ -1,4 +1,7 @@
-import React, { useState, useEffect } from 'react';
+'use client';
+
+import { logger } from '@/lib/logger';
+import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { prevStep, setStepAPI, submitApplicationAPI, selectLoanFormState } from '@/features/new-loan/store/newLoanFormSlice';
 import { updateLeadStatusThunk } from '@/features/new-lead/store/newLeadSlice';
@@ -53,7 +56,7 @@ export function Step3ReviewSubmit() {
       // Application submitted successfully
       await dispatch(setStepAPI(4)).unwrap();
     } catch (error) {
-      console.error("Failed to submit application", error);
+      logger.error("Failed to submit application", error);
       // Optional: Handle error UI here if needed
     }
   }

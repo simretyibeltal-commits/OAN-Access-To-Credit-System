@@ -1,6 +1,12 @@
 import { createSlice, createAsyncThunk, createSelector, PayloadAction } from '@reduxjs/toolkit';
 import type { RootState } from '../../../store';
-import { loanService, GetLoansParams } from '@/features/loans/api/loan.service';
+import { loanService, GetLoansParams, LoanApplicationSummary, LoanSummaryMetrics } from '@/features/loans/api/loan.service';
+import type { ApiResponse } from '@/types/api';
+
+// Sentinel sent to the API when the user has explicitly cleared all status
+// filters, signalling "match no statuses" (distinct from omitting the param,
+// which means "all statuses").
+const NO_STATUS_SENTINEL = '__NONE__';
 
 export const fetchLoans = createAsyncThunk(
   'loanDashboard/fetchLoans',
@@ -8,8 +14,9 @@ export const fetchLoans = createAsyncThunk(
     try {
       const response = await loanService.getLoans(params);
       return response;
-    } catch (error: any) {
-      return rejectWithValue(error.message || 'Failed to fetch loans');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Failed to fetch loans';
+      return rejectWithValue(message);
     }
   }
 );
@@ -20,27 +27,42 @@ export const fetchLoanSummary = createAsyncThunk(
     try {
       const response = await loanService.getLoanSummary();
       return response;
-    } catch (error: any) {
-      return rejectWithValue(error.message || 'Failed to fetch loan summary');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Failed to fetch loan summary';
+      return rejectWithValue(message);
     }
   }
 );
 
 export const updateLoanStatus = createAsyncThunk(
   'loanDashboard/updateLoanStatus',
-  async ({ id, status }: { id: string; status: string }, { rejectWithValue, dispatch }) => {
+  async ({ id, status, reason, notes }: { id: string; status: string; reason?: string; notes?: string }, { rejectWithValue, dispatch }) => {
     try {
-      const response = await loanService.updateLoanStatus(id, status);
+      const response = await loanService.updateLoanStatus(id, status, reason, notes);
       // Re-fetch loans after a successful update to refresh the list
       dispatch(fetchLoans());
       return response;
-    } catch (error: any) {
-      return rejectWithValue(error.message || 'Failed to update loan status');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Failed to update loan status';
+      return rejectWithValue(message);
     }
   }
 );
 
 const ALL_STATUS_VALUES = ['danger', 'info', 'neutral'];
+
+export interface MappedLoanRow extends Omit<LoanApplicationSummary, 'status'> {
+  id: string;
+  applicant: string;
+  phone: string;
+  loanAmount: string;
+  type: string;
+  status: string;
+  statusTone: string;
+  updated: string;
+  timestamp: number;
+  action: string;
+}
 
 export interface AdvancedFilters {
   status: string[];
@@ -53,10 +75,10 @@ export interface AdvancedFilters {
 }
 
 interface LoanDashboardState {
-  rawActivityData: any;
+  rawActivityData: ApiResponse<LoanApplicationSummary[]> | null;
   isLoading: boolean;
   loansError: string | null;
-  rawSummaryData: any;
+  rawSummaryData: ApiResponse<LoanSummaryMetrics> | null;
   isSummaryLoading: boolean;
   summaryError: string | null;
 
@@ -261,7 +283,7 @@ export const selectPagedRowsData = createSelector(
 
     let totalCount = rawActivityData?.pagination?.total ?? 0;
 
-    const mapped = rows.map((row: any) => {
+    const mapped = rows.map((row: LoanApplicationSummary): MappedLoanRow => {
       const rawDate = row.creation ? new Date(row.creation) : new Date();
       const dateStr = rawDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
       const timeStr = rawDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
@@ -301,7 +323,7 @@ export const selectLiveMetrics = createSelector(
   [selectRawSummaryData],
   (rawSummaryData) => {
     // fetchApi automatically unwraps the "message" envelope
-    const summaryData = rawSummaryData?.data || {};
+    const summaryData = rawSummaryData?.data || { total: 0, processing: 0, approved: 0, rejected: 0 };
 
     return {
       total: {
@@ -331,7 +353,7 @@ export const selectTabCounts = createSelector(
 export const selectQueryParams = createSelector(
   [selectActivityPage, selectPageSize, selectDateRange, selectSelectedStatuses, selectSearchQuery, selectActiveTab, selectTableStatusFilters, selectTableTypeFilters, selectAdvancedFilters],
   (activityPage, pageSize, dateRange, selectedStatuses, searchQuery, activeTab, tableStatusFilters, tableTypeFilters, advancedFilters) => {
-    const params: Record<string, any> = {
+    const params: GetLoansParams = {
       page: activityPage,
       page_size: pageSize,
     };
@@ -361,8 +383,14 @@ export const selectQueryParams = createSelector(
       params.from_date = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
     }
 
-    if (advancedFilters.dateFrom) params.from_date = advancedFilters.dateFrom.split('T')[0];
-    if (advancedFilters.dateTo) params.to_date = advancedFilters.dateTo.split('T')[0];
+    if (advancedFilters.dateFrom) {
+      const datePart = advancedFilters.dateFrom.split('T')[0];
+      if (datePart) params.from_date = datePart;
+    }
+    if (advancedFilters.dateTo) {
+      const datePart = advancedFilters.dateTo.split('T')[0];
+      if (datePart) params.to_date = datePart;
+    }
 
     const allChecked = selectedStatuses.length === ALL_STATUS_VALUES.length;
     let statusesToPass: string[] = [];
@@ -387,7 +415,7 @@ export const selectQueryParams = createSelector(
     if (statusesToPass.length > 0) {
       params.status = statusesToPass.join(',');
     } else if (selectedStatuses.length === 0 && tableStatusFilters.length === 0 && advancedFilters.status.length === 0) {
-      params.status = '__NONE__';
+      params.status = NO_STATUS_SENTINEL;
     }
 
     let typesToPass = [...tableTypeFilters];
@@ -413,4 +441,4 @@ export const selectQueryParams = createSelector(
   }
 );
 
-export default loanDashboardSlice.reducer;
+export const loanDashboardReducer = loanDashboardSlice.reducer;

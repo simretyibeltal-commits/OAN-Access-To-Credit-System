@@ -170,4 +170,4 @@ export const { setVisitSchedule, clearVisitState } = visitSlice.actions;
 
 export const selectVisitState = (state: RootState) => state.visit;
 
-export default visitSlice.reducer;
+export const visitReducer = visitSlice.reducer;

@@ -1,4 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
+import * as React from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useParams } from 'next/navigation';
 import { X, ShieldCheck, Check } from 'lucide-react';
@@ -59,13 +60,13 @@ export function OTPVerificationModal({ isOpen, onClose, farmerId, maskedPhone }:
     }
   };
 
-  const handlePaste = (e: React.ClipboardEvent) => {
+  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
     e.preventDefault();
     const pastedData = e.clipboardData.getData('text/plain').slice(0, 6).split('');
-    if (pastedData.some(char => isNaN(Number(char)))) return;
+    if (pastedData.some((char: string) => isNaN(Number(char)))) return;
 
     const newOtp = [...otp];
-    pastedData.forEach((char, index) => {
+    pastedData.forEach((char: string, index: number) => {
       if (index < 6) newOtp[index] = char;
     });
     setOtp(newOtp);
@@ -84,7 +85,7 @@ export function OTPVerificationModal({ isOpen, onClose, farmerId, maskedPhone }:
 
     setError(null);
     if (!leadId) {
-      alert("Missing Lead ID. Please try again.");
+      setError("Missing Lead ID. Please try again.");
       return;
     }
 

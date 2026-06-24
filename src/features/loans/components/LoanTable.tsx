@@ -23,7 +23,10 @@ export interface LoanTableRow {
   updated: string;
   action: string;
   timestamp: number;
-  [key: string]: any; // for other raw fields
+  application_id?: string;
+  region?: string;
+  amount?: string;
+  loanTerm?: string;
 }
 
 interface LoanTableProps {

@@ -1,11 +1,19 @@
+import { logger } from '@/lib/logger';
 import { useState } from 'react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { selectVisitState, selectIsLeadFinalized, setVisitSchedule, scheduleVisitThunk, fetchVisitSchedulesThunk, updateVisitScheduleStatusThunk } from '..';
 import { Calendar, CalendarCheck, Clock, MapPin, Pencil, CheckCircle } from 'lucide-react';
-import { ScheduleNewVisitForm } from './modals/ScheduleNewVisitForm';
 import { DatePickerField } from '@/components/ui/DatePickerField';
 import { useParams, useRouter } from 'next/navigation';
 import { normalizeLeadId } from '@/lib/utils';
+import dynamic from 'next/dynamic';
+
+const ScheduleNewVisitForm = dynamic(() => import('./modals/ScheduleNewVisitForm').then(mod => mod.ScheduleNewVisitForm), {
+  ssr: false,
+});
+const FeedbackModal = dynamic(() => import('@/components/ui/FeedbackModal').then(mod => mod.FeedbackModal), {
+  ssr: false,
+});
 
 interface ScheduleVisitCardProps {
   isScheduled?: boolean | undefined;
@@ -25,6 +33,7 @@ export function ScheduleVisitCard({
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCompleting, setIsCompleting] = useState(false);
+  const [errorFeedback, setErrorFeedback] = useState<string | null>(null);
   const activeLeadId = normalizeLeadId(params?.id as string);
 
   const isPassed = isScheduled && visitDate ? new Date(visitDate) < new Date() : false;
@@ -54,7 +63,7 @@ export function ScheduleVisitCard({
   const handleCompleteVisit = async () => {
     const scheduleId = visitSchedule?.id;
     if (!scheduleId) {
-      alert("Error: Schedule ID not found. Try refreshing the page.");
+      setErrorFeedback("Schedule ID not found. Try refreshing the page.");
       return;
     }
 
@@ -69,8 +78,8 @@ export function ScheduleVisitCard({
       // Refresh schedules list to clear the scheduled state live
       await dispatch(fetchVisitSchedulesThunk(activeLeadId)).unwrap();
     } catch (err: any) {
-      console.error("Failed to complete visit:", err);
-      alert(typeof err === 'string' ? err : err.message || 'Failed to complete visit');
+      logger.error("Failed to complete visit:", err);
+      setErrorFeedback(typeof err === 'string' ? err : err.message || 'Failed to complete visit');
     } finally {
       setIsCompleting(false);
     }
@@ -184,6 +193,14 @@ export function ScheduleVisitCard({
           onSave={handleSave}
         />
       )}
+
+      <FeedbackModal
+        isOpen={!!errorFeedback}
+        onClose={() => setErrorFeedback(null)}
+        type="error"
+        title="Error"
+        message={errorFeedback ?? ''}
+      />
     </div>
   );
 }

@@ -23,7 +23,7 @@ export {
   addActivityNoteThunk,
   fetchCreditInfoThunk,
   addCreditInfoThunk,
-  fetchSpecificLeadThunk,
+  fetchLeadProfileThunk,
   submitNewLeadThunk,
   updateLeadStatusThunk,
 } from './store/newLeadSlice';
@@ -36,6 +36,7 @@ export {
   updateFarmerDetails,
   clearFarmerState,
   selectFarmerState,
+  selectIsPollingLong,
 } from './store/farmerSlice';
 export type { FarmerDetails } from './store/farmerSlice';
 
@@ -43,6 +44,7 @@ export type { FarmerDetails } from './store/farmerSlice';
 export {
   searchFarmerConsent,
   verifyOtpThunk,
+  submitConsentThunk,
   clearConsentState,
   selectConsentState,
 } from './store/consentSlice';

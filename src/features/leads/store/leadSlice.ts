@@ -18,11 +18,14 @@ function findLeadById(leads: Lead[], id: string): Lead | undefined {
 
 export const fetchLeads = createAsyncThunk(
   'leads/fetchLeads',
-  async (params: GetLeadsParams | undefined, { rejectWithValue }) => {
+  async (params: GetLeadsParams | undefined, { signal, rejectWithValue }) => {
     try {
-      const response = await leadService.getLeads(params);
+      const response = await leadService.getLeads(params, signal);
       return response;
     } catch (error) {
+      if (error instanceof Error && error.name === 'AbortError') {
+        throw error;
+      }
       return rejectWithValue(error instanceof Error ? error.message : 'Failed to fetch leads');
     }
   }
@@ -149,6 +152,9 @@ const leadSlice = createSlice({
         state.totalCount = action.payload.totalCount;
       })
       .addCase(fetchLeads.rejected, (state, action) => {
+        // Ignore aborted requests (superseded by a newer query); the newer
+        // request's pending/fulfilled owns the loading and error state.
+        if (action.meta.aborted) return;
         state.isLeadsLoading = false;
         state.leadsError = action.payload as string;
       })
@@ -193,7 +199,8 @@ const leadSlice = createSlice({
       .addMatcher(
         fetchLeadDetailsThunk.fulfilled.match,
         (state, action) => {
-          const leadId = action.meta.arg;
+          const arg = action.meta.arg;
+          const leadId = typeof arg === 'string' ? arg : arg.leadId;
           const leadData = action.payload;
           if (leadData) {
             const lead = findLeadById(state.leads, leadId);
@@ -240,4 +247,4 @@ export const selectAdvFilters = (state: RootState) => state.leads.advFilters;
 export const selectFilteredLeads = (state: RootState) => state.leads.leads;
 
 
-export default leadSlice.reducer;
+export const leadReducer = leadSlice.reducer;

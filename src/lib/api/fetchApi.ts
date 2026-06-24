@@ -1,4 +1,10 @@
-const BASE_URL = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000';
+// In the browser, requests are same-origin. On the server (SSR), there is no
+// origin, so prefer an explicit deployment URL and fall back to localhost on
+// the actual configured port rather than a hardcoded 3000.
+const BASE_URL =
+  typeof window !== 'undefined'
+    ? window.location.origin
+    : process.env.NEXT_PUBLIC_SITE_URL ?? `http://localhost:${process.env.PORT ?? 3000}`;
 
 export class ApiError extends Error {
   responseData: unknown;
