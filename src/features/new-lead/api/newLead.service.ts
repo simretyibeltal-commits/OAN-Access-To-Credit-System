@@ -184,6 +184,10 @@ export interface BasicProfileBackendData {
   phone_number?: string;
   email?: string | null;
   location?: string | null;
+  region?: string | null;
+  woreda?: string | null;
+  kebele?: string | null;
+  language?: string | null;
   gender?: string | null;
   websub_delivered_at?: string | null;
   consent_type?: string;
@@ -318,7 +322,7 @@ export const newLeadService = {
       firstName: lead.first_name ?? '',
       lastName: lead.last_name ?? '',
       phoneNumber: lead.phone_number ?? '',
-      location: lead.location ?? '',
+      location: lead.region ?? lead.location ?? '',
       email: lead.email ?? '',
       gender: lead.gender ?? '',
       websub_delivered_at: lead.websub_delivered_at ?? '',

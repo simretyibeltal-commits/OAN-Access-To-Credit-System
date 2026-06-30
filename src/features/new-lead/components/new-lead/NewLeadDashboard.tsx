@@ -112,7 +112,7 @@ export function NewLeadDashboard({ id }: NewLeadDashboardProps) {
         <LeadLayoutGrid titleBanner={titleBanner} sidebar={sidebar} isViewMode={Boolean(id)}>
             <LeadInfoSection />
             <ConsentManagementSection />
-            {isOtpVerified && !consentDate && <ConsentFinalizationSection />}
+            {isOtpVerified && !consentDate && !farmerDetails?.farmer_profile_created && <ConsentFinalizationSection />}
             <FarmerDetailsSection />
             <CreditInformationSection />
             <CallDetailsSection />

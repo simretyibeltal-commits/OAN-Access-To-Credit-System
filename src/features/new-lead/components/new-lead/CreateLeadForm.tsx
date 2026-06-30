@@ -61,7 +61,12 @@ export function CreateLeadForm() {
       router.push(response?.lead_id ? `/leads/${response.lead_id}` : '/leads');
     } catch (error) {
       logger.error('Failed to create lead (Backend/System Error):', error);
-      setShowErrorPopup(true);
+      const errorMsg = typeof error === 'string' ? error : (error as Error)?.message || '';
+      if (errorMsg.toLowerCase().includes('already exists')) {
+        setValidationError(errorMsg);
+      } else {
+        setShowErrorPopup(true);
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -95,7 +100,7 @@ export function CreateLeadForm() {
           isEditable={true}
           phoneNumber={draft.phoneNumber}
           onPhoneNumberChange={handleChange('phoneNumber')}
-          phoneError={validationError || undefined}
+          phoneError={validationError || ''}
         />
 
         {/* Form Actions */}

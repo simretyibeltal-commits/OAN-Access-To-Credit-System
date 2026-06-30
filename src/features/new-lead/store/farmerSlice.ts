@@ -78,28 +78,15 @@ export const fetchLeadDetailsThunk = createAsyncThunk<
         try {
           const response = await newLeadService.getLeadDetails(leadId);
 
-          // The backend indicates a background demographic sync is in progress
-          // when the consent is submitted (status is no longer 'Pending OTP')
-          // but the profile hasn't been created yet.
-          const isSyncInProgress = response.consent_request_status !== 'Pending OTP' &&
-            response.consent_request_otp_verified === true &&
-            response.farmer_profile_created === false;
-
-          if (isSyncInProgress && !shouldPoll) {
-            shouldPoll = true;
-            maxRetries = 24; // dynamically enable polling
-            if (!timeoutId) {
-              timeoutId = setTimeout(() => {
-                dispatch(setIsPollingLong(true));
-              }, 2000);
-            }
-          }
-
           // Data has arrived if farmer_profile_created is true
           const dataArrived = response && response.farmer_profile_created === true;
 
           if (dataArrived || !shouldPoll) {
             return response;
+          }
+
+          if (response.consent_request_status === 'Failed') {
+            return rejectWithValue("Demographic sync failed. Please request a new OTP and re-submit the consent.");
           }
 
           logger.log(`Lead details not yet ready for leadId: ${leadId}. Retrying in 5 seconds... (Attempt ${retries + 1}/${maxRetries})`);
@@ -124,7 +111,11 @@ export const fetchLeadDetailsThunk = createAsyncThunk<
 
       // Final attempt before rejecting
       try {
-        return await newLeadService.getLeadDetails(leadId);
+        const finalResponse = await newLeadService.getLeadDetails(leadId);
+        if (shouldPoll && finalResponse.farmer_profile_created === false) {
+          return rejectWithValue("Demographic sync failed. Please request a new OTP and re-submit the consent.");
+        }
+        return finalResponse;
       } catch (error) {
         return rejectWithValue(error instanceof Error ? error.message : 'Unknown Cause: Failed to fetch lead details after retries');
       }
@@ -203,7 +194,7 @@ const farmerSlice = createSlice({
       .addCase(initializeLead, (state, action) => {
         const payload = action.payload ?? {};
         state.farmerId = payload.farmerId ?? '';
-        state.farmerDetails = createDefaultFarmerDetails(payload.farmerDetails);
+        state.farmerDetails = createDefaultFarmerDetails(); // Don't load details from initial lead
         state.searchedFarmer = null;
         state.isSearchingFarmer = false;
         state.searchError = null;

@@ -44,9 +44,6 @@ export function useLeadInitialization(id?: string) {
             return;
         }
 
-        const nameParts = existingLead?.name ? existingLead.name.split(' ') : [];
-        const firstName = nameParts[0] || '';
-        const lastName = nameParts.slice(1).join(' ') || '';
 
         dispatch(initializeLead({
             id: `#${id}`,

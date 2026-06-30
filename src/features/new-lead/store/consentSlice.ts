@@ -158,6 +158,31 @@ const consentSlice = createSlice({
         state.isSubmittingConsent = false;
         state.consentError = action.payload as string;
       })
+      .addCase(fetchLeadDetailsThunk.fulfilled, (state, action) => {
+        if (action.payload.farmer_profile_created === false) {
+          // If the profile isn't created, force a complete reset of the consent flow
+          state.isOtpVerified = false;
+          state.consentDate = null;
+          state.consentRequestId = null;
+          state.isVerifyingOtp = false;
+          state.isSubmittingConsent = false;
+          state.consentFormFilename = null;
+          state.consentFormBase64 = null;
+        } else {
+          // If profile is created, ensure UI treats it as verified and consented
+          state.isOtpVerified = true;
+          // We can optionally set consentDate to a default or true value if missing,
+          // but typically it's loaded via existingLead or we leave it if it's already set.
+        }
+      })
+      .addCase(fetchLeadDetailsThunk.rejected, (state, action) => {
+        if (action.payload === 'Demographic sync failed. Please request a new OTP and re-submit the consent.') {
+          state.isOtpVerified = false;
+          state.consentDate = null;
+          state.consentRequestId = null;
+          state.consentError = action.payload as string;
+        }
+      })
       .addCase(initializeLead, (state, action) => {
         const payload = action.payload ?? {};
         state.consentDate = payload.consentDate || null;

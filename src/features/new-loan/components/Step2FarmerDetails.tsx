@@ -25,6 +25,8 @@ interface FieldConfig {
   options?: typeof GENDER_OPTIONS;
   // Masked by default in the UI (e.g. National/Fayda ID); revealed on demand.
   sensitive?: boolean;
+  // If the value from API is comma-separated, display it as a list of items
+  isList?: boolean;
 }
 
 interface SectionConfig {
@@ -35,6 +37,15 @@ interface SectionConfig {
 
 const FORM_SECTIONS: SectionConfig[] = [
   {
+    title: 'Loan Details',
+    gridCols: 'lg:grid-cols-3',
+    fields: [
+      { key: 'loanType', label: 'Loan Type', apiKey: 'loan_type' },
+      { key: 'loanAmount', label: 'Loan Amount', apiKey: 'loan_amount' },
+      { key: 'loanReason', label: 'Loan Reason', apiKey: 'loan_reason' },
+    ],
+  },
+  {
     title: 'Basic Information',
     gridCols: 'lg:grid-cols-3',
     fields: [
@@ -43,6 +54,7 @@ const FORM_SECTIONS: SectionConfig[] = [
       { key: 'mobilePhone', label: 'Mobile Phone', apiKey: 'phone_number' },
       { key: 'dateOfBirth', label: 'Date of Birth', apiKey: 'date_of_birth' },
       { key: 'gender', label: 'Gender', apiKey: 'gender', type: 'select', options: GENDER_OPTIONS },
+      { key: 'region', label: 'Region', apiKey: 'region' },
       { key: 'woreda', label: 'Woreda', apiKey: 'woreda' },
       { key: 'kebele', label: 'Kebele', apiKey: 'kebele' },
       { key: 'idType', label: 'ID Type', apiKey: 'id_type' },
@@ -50,17 +62,7 @@ const FORM_SECTIONS: SectionConfig[] = [
       { key: 'language', label: 'Language', apiKey: 'language' },
     ],
   },
-  {
-    title: 'Land and Crop Information',
-    gridCols: 'lg:grid-cols-3',
-    fields: [
-      { key: 'landSize', label: 'Land Size (Acres)', apiKey: 'land_size' },
-      { key: 'farmId', label: 'Farm ID', apiKey: 'farm_id' },
-      { key: 'farmPolygon', label: 'Farm Polygon', apiKey: 'farm_polygon' },
-      { key: 'landAcreage', label: 'Land Acreage', apiKey: 'land_acreage' },
-      { key: 'farmLandNumber', label: 'Farm Land Number', apiKey: 'farm_land_number' },
-    ],
-  },
+
   {
     title: 'Socio Economic Information',
     gridCols: 'lg:grid-cols-3',
@@ -71,7 +73,7 @@ const FORM_SECTIONS: SectionConfig[] = [
       { key: 'noOfFemales', label: 'No. of Females (Family)', apiKey: 'no_of_females_family' },
       { key: 'noOfMales', label: 'No. of Males (Family)', apiKey: 'no_of_males_family' },
       { key: 'familyMemberOwnsLand', label: 'A Family Member Owns Land Independently', apiKey: 'family_member_owns_land_independently' },
-      { key: 'sourceOfIncome', label: 'Source of Income', apiKey: 'source_of_income' },
+      { key: 'sourceOfIncome', label: 'Source of Income', apiKey: 'source_of_income', isList: true },
       { key: 'educationLevel', label: 'Education Level', apiKey: 'education_level' },
     ],
   },
@@ -82,7 +84,7 @@ const FORM_SECTIONS: SectionConfig[] = [
       { key: 'totalFarmlandLandowner', label: 'Total Farmland Size as Landowner', apiKey: 'total_farmland_size_as_landowner' },
       { key: 'totalFarmlandCropSharing', label: 'Total Farmland Size as Crop Sharing', apiKey: 'total_farmland_size_as_crop_sharing' },
       { key: 'totalFarmlandRented', label: 'Total Farmland Size as Rented', apiKey: 'total_farmland_size_as_rented' },
-      { key: 'certificationId', label: 'Certification ID', apiKey: 'certification_id' },
+      { key: 'certificationId', label: 'Certification ID', apiKey: 'certification_id', isList: true },
       { key: 'certificationPhoto', label: 'Certification Photo', apiKey: 'certification_photo_url' },
     ],
   },
@@ -90,10 +92,8 @@ const FORM_SECTIONS: SectionConfig[] = [
     title: 'Agronomic Data',
     gridCols: 'lg:grid-cols-4',
     fields: [
-      { key: 'farmlandSizeHectares', label: 'Farmland Size (Hectares)', apiKey: 'farmland_size_hectares' },
+      { key: 'farmlandSizeHectares', label: 'Farmland Size (Hectares)', apiKey: 'farmland_size_hectares', isList: true },
       { key: 'landOwnershipStatus', label: 'Land Ownership Status', apiKey: 'land_ownership_status' },
-      { key: 'soilFertility', label: 'Soil Fertility / Minerals', apiKey: 'soil_fertility_minerals' },
-      { key: 'moistureLevels', label: 'Moisture Levels', apiKey: 'moisture_levels' },
     ],
   },
 ];
@@ -113,7 +113,11 @@ function mapApiToFarmerDetails(data: LoanApplicationFull): FarmerDetails {
   FORM_SECTIONS.forEach((section) => {
     section.fields.forEach((field) => {
       const val = data[field.apiKey as keyof LoanApplicationFull];
-      result[field.key] = (val !== undefined && val !== null) ? String(val) : '';
+      if (typeof val === 'boolean') {
+        result[field.key] = val ? 'Yes' : 'No';
+      } else {
+        result[field.key] = (val !== undefined && val !== null) ? String(val) : '';
+      }
     });
   });
   return result;
@@ -149,7 +153,7 @@ export function Step2FarmerDetails() {
         setIsLoadingProfile(true);
         const response = await loanService.getFullProfile(applicationId);
         const data = response?.data || {};
-        
+
         setFormData(mapApiToFarmerDetails(data));
       } catch (err) {
         logger.error("Failed to load full profile:", err);
@@ -212,6 +216,27 @@ export function Step2FarmerDetails() {
                 );
               }
               const rawValue = formData[field.key] ?? '';
+
+              if (field.isList) {
+                const listItems = rawValue ? rawValue.split(',').map(s => s.trim()).filter(Boolean) : [];
+                return (
+                  <div key={field.key} className="flex flex-col gap-1.5">
+                    <label className="text-[13px] font-semibold text-[#16335A] uppercase tracking-wide">{field.label}</label>
+                    {listItems.length > 0 ? (
+                      <div className="flex flex-wrap gap-2">
+                        {listItems.map((item, idx) => (
+                          <div key={idx} className="bg-gray-50 border border-gray-300 rounded-md px-3 py-2 text-[15px] font-medium text-gray-900">
+                            {item}
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <TextField label="" value="" readOnly />
+                    )}
+                  </div>
+                );
+              }
+
               if (field.sensitive) {
                 const isRevealed = !!revealedFields[field.key];
                 const displayValue = isRevealed || !rawValue ? rawValue : maskSensitiveId(rawValue);

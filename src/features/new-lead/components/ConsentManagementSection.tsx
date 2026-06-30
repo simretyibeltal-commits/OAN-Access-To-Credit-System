@@ -28,7 +28,10 @@ export function ConsentManagementSection() {
 
   const isProfileCreated = !!farmerDetails?.farmer_profile_created || !!farmerDetails?.firstName;
   const isFinalizingConsent = isOtpVerified && !consentDate;
-  const isSyncInProgress = farmerDetails?.consent_request_status !== 'Pending OTP' && 
+  
+  // Only consider sync in progress if we are actively tracking it in this session (isOtpVerified = true)
+  const isSyncInProgress = isOtpVerified &&
+                           farmerDetails?.consent_request_status !== 'Pending OTP' && 
                            farmerDetails?.consent_request_otp_verified === true && 
                            farmerDetails?.farmer_profile_created === false;
 
