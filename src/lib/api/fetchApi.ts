@@ -35,6 +35,33 @@ async function refreshSession(): Promise<boolean> {
     return false;
   }
 }
+async function fetchWithTimeout(url: string, options: RequestInit, timeoutMs = 15000) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(new Error('TimeoutError')), timeoutMs);
+  
+  if (options.signal) {
+    if (options.signal.aborted) {
+      controller.abort(options.signal.reason);
+    } else {
+      options.signal.addEventListener('abort', () => controller.abort(options.signal?.reason));
+    }
+  }
+
+  try {
+    const response = await fetch(url, { ...options, signal: controller.signal });
+    clearTimeout(timeoutId);
+    return response;
+  } catch (error: any) {
+    clearTimeout(timeoutId);
+    if (error.name === 'AbortError' && options.signal?.aborted) {
+      throw error; // Intentional abort from frontend (e.g. unmount)
+    }
+    if (error.message === 'TimeoutError' || error.name === 'TimeoutError' || error.name === 'AbortError') {
+      throw new ApiError('The server is taking too long to respond. Please try again.', null, 408);
+    }
+    throw new ApiError('Network error. Please check your connection.', null, 0);
+  }
+}
 
 export async function fetchApi(path: string, options: RequestInit = {}) {
   const url = new URL(`/api/proxy/api/method/${path}`, BASE_URL);
@@ -44,7 +71,7 @@ export async function fetchApi(path: string, options: RequestInit = {}) {
     headers.set('Content-Type', 'application/json');
   }
 
-  let response = await fetch(url.toString(), {
+  let response = await fetchWithTimeout(url.toString(), {
     ...options,
     headers,
   });
@@ -64,7 +91,7 @@ export async function fetchApi(path: string, options: RequestInit = {}) {
     }
     const success = await activeRefresh;
     if (success) {
-      response = await fetch(url.toString(), {
+      response = await fetchWithTimeout(url.toString(), {
         ...options,
         headers,
       });
