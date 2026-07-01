@@ -22,6 +22,7 @@ describe('newLeadService', () => {
             phone: '1234567890',
             email: 'john@example.com',
             location: 'Kerala',
+            profile_image_url: 'https://example.com/image.jpg',
           },
         },
       });
@@ -34,6 +35,7 @@ describe('newLeadService', () => {
         email: 'john@example.com',
         location: 'Kerala',
         gender: '',
+        profileImageUrl: 'https://example.com/image.jpg',
       });
       expect(fetchApi).toHaveBeenCalledWith('oan_a2c.api.v1.consent.api.search_farmer', {
         method: 'POST',
@@ -60,6 +62,7 @@ describe('newLeadService', () => {
         email: 'jane@example.com',
         location: 'Delhi',
         gender: '',
+        profileImageUrl: '',
       });
     });
 
@@ -408,6 +411,9 @@ describe('newLeadService', () => {
           status: 'Prospect',
           lead_source: 'Walk-in',
           assigned_to: 'agent@oan.com',
+          phone_number: '',
+          first_name: undefined,
+          last_name: undefined,
         },
       ]);
     });

@@ -14,6 +14,7 @@ import type { CreditInfoAPI, AddCreditInfoResponse } from '@/lib/api/api.schemas
 import { formatTiming } from './helpers';
 import { fetchAssignmentInfoThunk } from './assignmentSlice';
 import { initializeLead, clearForm } from './actions';
+import { fetchLeadDetailsThunk } from './farmerSlice';
 import { ApiError } from '@/lib/api/fetchApi';
 import { normalizeLeadId } from '@/lib/utils';
 
@@ -62,6 +63,9 @@ interface NewLeadState {
   activities: Activity[];
   isSubmitting: boolean;
   draft: NewLeadDraft;
+  leadPhoneNumber: string;
+  leadFirstName: string;
+  leadLastName: string;
 }
 
 const getInitialDraft = (): NewLeadDraft => ({
@@ -84,6 +88,9 @@ const getInitialState = (): NewLeadState => ({
   activities: [],
   isSubmitting: false,
   draft: getInitialDraft(),
+  leadPhoneNumber: '',
+  leadFirstName: '',
+  leadLastName: '',
 });
 
 const initialState: NewLeadState = getInitialState();
@@ -298,6 +305,9 @@ const newLeadSlice = createSlice({
           state.creditInfo = [];
           state.callDetails = [];
           state.activities = [];
+          state.leadPhoneNumber = '';
+          state.leadFirstName = '';
+          state.leadLastName = '';
         }
         state.isSubmitting = false;
       })
@@ -346,7 +356,18 @@ const newLeadSlice = createSlice({
           if (lead) {
             if (lead.status) state.leadStatus = lead.status;
             if (lead.lead_source) state.leadSource = lead.lead_source;
+            if (lead.phone_number) state.leadPhoneNumber = lead.phone_number;
+            if (lead.first_name) state.leadFirstName = lead.first_name;
+            if (lead.last_name) state.leadLastName = lead.last_name;
           }
+        }
+      })
+      .addCase(fetchLeadDetailsThunk.fulfilled, (state, action) => {
+        const payload = action.payload;
+        if (payload) {
+          if (payload.firstName) state.leadFirstName = payload.firstName;
+          if (payload.lastName) state.leadLastName = payload.lastName;
+          if (payload.phoneNumber) state.leadPhoneNumber = payload.phoneNumber;
         }
       })
       .addCase(addCreditInfoThunk.fulfilled, (state, action) => {
@@ -409,6 +430,9 @@ export const selectCallDetails = (state: RootState) => state.newLead.callDetails
 export const selectActivities = (state: RootState) => state.newLead.activities;
 export const selectIsSubmitting = (state: RootState) => state.newLead.isSubmitting;
 export const selectNewLeadDraft = (state: RootState) => state.newLead.draft;
+export const selectLeadPhoneNumber = (state: RootState) => state.newLead.leadPhoneNumber;
+export const selectLeadFirstName = (state: RootState) => state.newLead.leadFirstName;
+export const selectLeadLastName = (state: RootState) => state.newLead.leadLastName;
 
 export const selectIsLeadFinalized = (state: RootState) => {
   const status = state.newLead.leadStatus?.toLowerCase() || '';
