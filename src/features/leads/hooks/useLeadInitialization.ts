@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { selectLeads } from '@/features/leads/store/leadSlice';
+import { selectLeads, fetchLeads } from '@/features/leads/store/leadSlice';
 import { initializeLead } from '@/features/new-lead/store/newLeadSlice';
 
 /**
@@ -39,13 +39,11 @@ export function useLeadInitialization(id?: string) {
         // so it can re-run and populate the farmer details once the leads arrive.
         if (!existingLead && leads.length === 0) {
             dispatch(initializeLead({ id: `#${id}` }));
+            dispatch(fetchLeads({ search_query: id }));
             lastInitializedId.current = currentIdKey;
             return;
         }
 
-        const nameParts = existingLead?.name ? existingLead.name.split(' ') : [];
-        const firstName = nameParts[0] || '';
-        const lastName = nameParts.slice(1).join(' ') || '';
 
         dispatch(initializeLead({
             id: `#${id}`,
@@ -54,12 +52,6 @@ export function useLeadInitialization(id?: string) {
             farmerId: existingLead?.farmerId || '',
             consentDate: existingLead?.consentDate || '',
             consentRequestId: existingLead?.consentRequestId || null,
-            farmerDetails: {
-                firstName,
-                lastName,
-                phoneNumber: existingLead?.farmerPhone || '',
-                location: existingLead?.location || ''
-            }
         }));
 
         lastInitializedId.current = currentIdKey;

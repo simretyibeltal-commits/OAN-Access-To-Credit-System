@@ -79,7 +79,8 @@ export function LoginClient() {
               alt="Ethiopia OpenAgriNet Logo"
               width={220}
               height={56}
-              className="h-[48px] sm:h-[56px] w-auto shrink-0"
+              className="h-[48px] sm:h-[56px] shrink-0"
+              style={{ width: 'auto' }}
             />
             <div className="flex flex-col">
               <span className="font-semibold text-[#16335A] text-[14px] sm:text-[16px] leading-[14px] sm:leading-[16px]">Ethiopia OpenAgriNet</span>
@@ -118,7 +119,8 @@ export function LoginClient() {
                     alt="Ethiopia OpenAgriNet Logo"
                     width={220}
                     height={72}
-                    className="h-[56px] sm:h-[72px] w-auto object-left shrink-0"
+                    className="h-[56px] sm:h-[72px] object-left shrink-0"
+                    style={{ width: 'auto' }}
                   />
                   <div className="flex flex-col">
                     <span className="font-semibold text-white text-[16px] sm:text-[20px] leading-tight tracking-wide">Ethiopia OpenAgriNet</span>
