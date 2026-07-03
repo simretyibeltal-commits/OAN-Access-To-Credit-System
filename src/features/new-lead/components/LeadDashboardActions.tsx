@@ -82,7 +82,7 @@ export function LeadDashboardActions({ leadId, status }: LeadDashboardActionsPro
             }
             setModalAction(null);
         } catch (e: any) {
-            logger.error('Failed to update lead status:', e);
+            logger.warn('Failed to update lead status:', e);
             const errorMessage = typeof e === 'string' ? e : e?.message || 'Failed to update lead status. Please try again.';
             if (outcome === 'Verified') {
                 dispatch(setVerificationBlocked(true));
