@@ -5,7 +5,7 @@ _Generated: 2026-06-13 · Backend resolutions applied: 2026-06-24_
 > | # | Priority action | Status |
 > |---|-----------------|--------|
 > | 1 | `get_leads` / `get_all_loans` server-side pagination | ✅ Done (already present) |
-> | 2 | DB indexes on `status`, `assigned_to` for the leads query | ✅ Done (`search_index`; apply on `bench migrate`) |
+> | 2 | DB indexes on `status`, `assigned_to` for the leads query | ✅ Done (`search_index`; apply on the next backend migration) |
 > | 3 | Eliminate `get_visit_schedules` bulk prefetch (**critical**) | ✅ Done — latest visit folded into `get_leads` |
 > | 4 | `get_lead_metadata` server-side caching | ✅ Done (Redis, 1h TTL) |
 > | 5 | Atomic loan creation (drop `update_lead_status` + refetch) | ✅ Done — lead → `Processed` in `create_loan_application` |
@@ -100,7 +100,7 @@ Every time the leads dashboard mounts or filters change:
 - ✅ **Done** — `get_leads` and `get_all_loans` are server-side paginated (`start`/`page_length`,
   default 20, with `total_count`). _(Stale-while-revalidate caching is a separate, optional frontend layer.)_
 - ✅ **Done** — Added DB indexes (`search_index`) on `status` and `assigned_to` (apply on next
-  `bench migrate`). `creation` is indexed by Frappe natively; `lead_id` filters resolve via the
+  the next backend migration). `creation` is indexed by the backend natively; `lead_id` filters resolve via the
   linked-doctype subquery so no extra index needed on Lead itself.
 - ✅ **Done** — `get_visit_schedules` bulk prefetch eliminated. `get_leads` now folds each lead's
   **latest** visit (`visit_date` + `schedule_status`) into the list response via a single query
@@ -236,7 +236,7 @@ createLoanApplication(lead_id)   [on wizard start]
 #### `get_leads` response
 The frontend only renders: `id, name, phone, status, location, loanType, loanAmount, source, assignedTo, creation, visitDate, scheduleStatus`.
 
-Currently the response likely includes full Frappe document metadata (`owner`, `modified_by`, `docstatus`, `idx`, `__islocal`, etc.). Strip these server-side.
+Currently the response likely includes full backend document metadata (`owner`, `modified_by`, `docstatus`, `idx`, `__islocal`, etc.). Strip these server-side.
 
 **Recommendation:** Return a projection:
 ```json
@@ -272,7 +272,7 @@ Currently the response likely includes full Frappe document metadata (`owner`, `
 
 #### `get_lead_metadata` response — ✅ backend cached
 This is static configuration data (`sources`, `statuses`, `loan_types`) derived from doctype Select
-options, which only change on `bench migrate`.
+options, which only change on the next backend migration.
 - ✅ **Done** — now cached server-side in Redis (`frappe.cache()`, key `a2c_lead_metadata`,
   `expires_in_sec=3600`). RBAC is still enforced on every request; only the meta computation is cached.
 - _Optional frontend layer:_ store in Redux with a `fetchedAt` timestamp / embed at build time if it
