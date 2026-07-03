@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { Loader2, ArrowLeft, Check } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { useAppDispatch } from '@/store/hooks';
-import { selectLoanCurrentStep, selectLoanFormState, setStepAPI, fetchLoanApplicationAPI } from '@/features/new-loan/store/newLoanFormSlice';
+import { selectLoanCurrentStep, selectLoanFormState, setStepAPI, setLeadId, fetchLoanApplicationAPI } from '@/features/new-loan/store/newLoanFormSlice';
 import { NewLoanProgressBar } from './NewLoanProgressBar';
 import { Step1ConsentDocs } from './Step1ConsentDocs';
 import { Step2FarmerDetails } from './Step2FarmerDetails';
@@ -31,6 +31,9 @@ export function NewLoanOrchestrator({ leadId }: { leadId?: string }) {
 
   useEffect(() => {
     if (!isMounted || !leadId) return;
+    // Persist the lead ID into the slice so any step (or thunk) can read it
+    // from state, rather than re-deriving it from the route.
+    dispatch(setLeadId(leadId));
     dispatch(fetchLoanApplicationAPI(leadId));
   }, [isMounted, leadId, dispatch]);
 

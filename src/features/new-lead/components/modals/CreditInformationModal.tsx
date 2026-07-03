@@ -41,7 +41,8 @@ export function CreditInformationModal({ isOpen, onClose, onSubmit }: CreditInfo
 
   if (!isOpen || !mounted) return null;
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e?: React.FormEvent) => {
+    e?.preventDefault();
     // 1. Run local Zod schema validation
     const validationResult = creditInfoSchema.safeParse({ loanType, loanAmount, purposeMessage });
     if (!validationResult.success) {
@@ -103,6 +104,7 @@ export function CreditInformationModal({ isOpen, onClose, onSubmit }: CreditInfo
             </button>
           </div>
 
+          <form onSubmit={handleSubmit} className="w-full">
           {/* Body */}
           <div className="flex flex-col items-start p-[24px_24px_0px] gap-[16px] w-full">
             {/* General Error Banner */}
@@ -186,6 +188,7 @@ export function CreditInformationModal({ isOpen, onClose, onSubmit }: CreditInfo
           {/* Footer */}
           <div className="box-border flex flex-row justify-end items-center p-[24px] gap-[12px] w-full h-[87px] border-t border-[#E5E7EB] mt-[24px]">
             <button
+              type="button"
               onClick={onClose}
               disabled={isSubmitting}
               className="box-border flex flex-col justify-center items-center p-[8px_16px] w-[76.86px] h-[40px] bg-white border border-[#D4D4D4] shadow-[0px_1px_2px_rgba(0,0,0,0.05)] rounded-[8px] hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
@@ -196,7 +199,7 @@ export function CreditInformationModal({ isOpen, onClose, onSubmit }: CreditInfo
             </button>
 
             <button
-              onClick={handleSubmit}
+              type="submit"
               disabled={isSubmitting || !loanType || !loanAmount || !purposeMessage}
               className="relative flex flex-row justify-center items-center p-[10px_24px] min-w-[93px] h-[40px] bg-[#16A34A] rounded-[8px] hover:bg-[#15803d] transition-colors overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-[#16A34A]"
             >
@@ -216,6 +219,7 @@ export function CreditInformationModal({ isOpen, onClose, onSubmit }: CreditInfo
               </span>
             </button>
           </div>
+          </form>
 
         </div>
       </div>

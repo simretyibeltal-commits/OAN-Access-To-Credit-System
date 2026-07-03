@@ -98,6 +98,7 @@ export interface SpecificLeadAPI {
 export interface CallLogAPI {
   source: string;
   ref_id: string;
+  received: string;
   timestamp: string;
 }
 

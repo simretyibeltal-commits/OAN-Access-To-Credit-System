@@ -136,7 +136,7 @@ export async function fetchApi(path: string, options: RequestInit = {}) {
     throw new ApiError(errorMsg, responseData, response.status);
   }
 
-  // Handle Frappe's "200 OK" application-level errors
+  // Handle "200 OK" application-level errors
   if (responseData?.message?.status === 'error') {
     throw new ApiError(responseData.message.message || 'Application Error', responseData);
   }
