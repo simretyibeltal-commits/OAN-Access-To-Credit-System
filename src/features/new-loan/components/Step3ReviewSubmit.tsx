@@ -3,7 +3,6 @@
 import { logger } from '@/lib/logger';
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useSearchParams } from 'next/navigation';
 import { prevStep, setStepAPI, submitApplicationAPI, selectLoanFormState } from '@/features/new-loan/store/newLoanFormSlice';
 import { updateLeadStatusThunk } from '@/features/new-lead';
 import { ArrowLeft, Send, Check, User, Folder, ChevronDown, Loader2, AlertCircle } from 'lucide-react';
@@ -11,9 +10,7 @@ import type { AppDispatch } from '@/store';
 
 export function Step3ReviewSubmit() {
   const dispatch = useDispatch<AppDispatch>();
-  const searchParams = useSearchParams();
-  const leadId = searchParams?.get('leadId');
-  const { applicationId, loadingStates } = useSelector(selectLoanFormState);
+  const { leadId, applicationId, loadingStates } = useSelector(selectLoanFormState);
 
   const [acknowledged, setAcknowledged] = useState(false);
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
@@ -37,8 +34,7 @@ export function Step3ReviewSubmit() {
         await dispatch(submitApplicationAPI(applicationId)).unwrap();
       }
 
-      // Application submitted successfully
-      console.log('Attempting to update lead status to Processed for leadId:', leadId);
+      // Application submitted successfully — advance the lead to "Processed".
       if (leadId) {
         try {
           await dispatch(updateLeadStatusThunk({
@@ -46,12 +42,11 @@ export function Step3ReviewSubmit() {
             status: 'Processed',
             reason: 'Loan application submitted successfully.'
           })).unwrap();
-          console.log('Successfully updated lead status to Processed on backend');
         } catch (statusError) {
-          console.error('Failed to update lead status on backend:', statusError);
+          logger.error('Failed to update lead status on backend:', statusError);
         }
       } else {
-        console.warn('No leadId found in URL parameters, skipping backend status update');
+        logger.warn('No leadId in loan form state, skipping lead status update');
       }
 
       await dispatch(setStepAPI(4)).unwrap();

@@ -43,7 +43,8 @@ export function CreateLeadForm() {
 
   const [validationError, setValidationError] = useState<string | null>(null);
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e?: React.FormEvent) => {
+    e?.preventDefault();
     // 1. Zod Validation
     const validationResult = createLeadSchema.safeParse({ phoneNumber: draft.phoneNumber });
 
@@ -96,29 +97,32 @@ export function CreateLeadForm() {
         </div>
 
         {/* Lead Information */}
-        <LeadInfoSection
-          isEditable={true}
-          phoneNumber={draft.phoneNumber}
-          onPhoneNumberChange={handleChange('phoneNumber')}
-          phoneError={validationError || ''}
-        />
+        <form onSubmit={handleSubmit} className="flex flex-col items-start gap-6 w-full">
+          <LeadInfoSection
+            isEditable={true}
+            phoneNumber={draft.phoneNumber}
+            onPhoneNumberChange={handleChange('phoneNumber')}
+            phoneError={validationError || ''}
+          />
 
-        {/* Form Actions */}
-        <div className="flex flex-col sm:flex-row justify-end items-center p-4 sm:p-6 w-full bg-white border border-[#F1F3F4] shadow-[0px_4px_6px_-1px_rgba(0,0,0,0.05),0px_2px_4px_-1px_rgba(0,0,0,0.03)] rounded-xl gap-4 font-semibold">
-          <button
-            onClick={handleClear}
-            className="flex justify-center items-center px-5 py-2.5 w-full sm:w-auto bg-white border border-[#D1D5DC] rounded-[10px] text-[#364153] font-inter font-medium text-sm hover:bg-gray-50 transition-colors"
-          >
-            Clear Form
-          </button>
-          <button
-            onClick={handleSubmit}
-            disabled={isSubmitting}
-            className="flex justify-center items-center px-5 py-2.5 w-full sm:w-auto bg-[#16A34A] rounded-[10px] text-white font-inter font-medium text-sm shadow-[0px_1px_3px_rgba(0,0,0,0.1),0px_1px_2px_-1px_rgba(0,0,0,0.1)] hover:bg-[#15803d] transition-colors disabled:opacity-70"
-          >
-            {isSubmitting ? 'Submitting...' : 'Submit Lead'}
-          </button>
-        </div>
+          {/* Form Actions */}
+          <div className="flex flex-col sm:flex-row justify-end items-center p-4 sm:p-6 w-full bg-white border border-[#F1F3F4] shadow-[0px_4px_6px_-1px_rgba(0,0,0,0.05),0px_2px_4px_-1px_rgba(0,0,0,0.03)] rounded-xl gap-4 font-semibold">
+            <button
+              type="button"
+              onClick={handleClear}
+              className="flex justify-center items-center px-5 py-2.5 w-full sm:w-auto bg-white border border-[#D1D5DC] rounded-[10px] text-[#364153] font-inter font-medium text-sm hover:bg-gray-50 transition-colors"
+            >
+              Clear Form
+            </button>
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="flex justify-center items-center px-5 py-2.5 w-full sm:w-auto bg-[#16A34A] rounded-[10px] text-white font-inter font-medium text-sm shadow-[0px_1px_3px_rgba(0,0,0,0.1),0px_1px_2px_-1px_rgba(0,0,0,0.1)] hover:bg-[#15803d] transition-colors disabled:opacity-70"
+            >
+              {isSubmitting ? 'Submitting...' : 'Submit Lead'}
+            </button>
+          </div>
+        </form>
 
         <FeedbackModal
           isOpen={showErrorPopup}

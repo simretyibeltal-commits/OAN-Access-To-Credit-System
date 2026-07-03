@@ -18,9 +18,7 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
 
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
+  allowedDevOrigins: ['192.168.3.1'],
 
   sassOptions: {
     includePaths: ['./src/assets/styles'],

@@ -19,7 +19,7 @@ graph TD
     Redux[Redux Toolkit\nGlobal State]
     API[API Service Layer]
     Auth[JWT Middleware]
-    Backend[Frappe Python Backend]
+    Backend[Python Backend]
     DB[(Database)]
 
     Client -->|User Interactions| Next

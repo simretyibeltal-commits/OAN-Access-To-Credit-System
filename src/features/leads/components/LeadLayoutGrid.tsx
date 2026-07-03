@@ -27,8 +27,9 @@ export function LeadLayoutGrid({ children, sidebar, titleBanner, isViewMode = fa
         dispatch(clearForm());
     };
 
-    const handleSubmit = async () => {
-        // Validation logic can be passed in or handled via Form context, 
+    const handleSubmit = async (e?: React.FormEvent) => {
+        e?.preventDefault();
+        // Validation logic can be passed in or handled via Form context,
         // but for now we keep the simple redux dispatch intact.
         setIsSubmitting(true);
         try {
@@ -66,20 +67,21 @@ export function LeadLayoutGrid({ children, sidebar, titleBanner, isViewMode = fa
                 <div className="flex flex-col-reverse lg:flex-row items-start gap-6 w-full">
 
                     {/* Left Column (Forms) */}
-                    <div className="flex flex-col items-start gap-6 flex-1 w-full min-w-0">
+                    <form onSubmit={handleSubmit} className="flex flex-col items-start gap-6 flex-1 w-full min-w-0">
                         {children}
 
                         {/* Form Actions Bottom */}
                         {!isViewMode && (
                             <div className="flex flex-col sm:flex-row justify-end items-center p-4 sm:p-6 w-full bg-white border border-[#F1F3F4] shadow-[0px_4px_6px_-1px_rgba(0,0,0,0.05),0px_2px_4px_-1px_rgba(0,0,0,0.03)] hover:-translate-y-1 hover:shadow-lg transition-all duration-300 rounded-xl gap-4 font-semibold">
                                 <button
+                                    type="button"
                                     onClick={handleClear}
                                     className="flex justify-center items-center px-5 py-2.5 w-full sm:w-auto bg-white border border-[#D1D5DC] rounded-[10px] text-[#364153] font-inter font-medium text-sm hover:bg-gray-50 transition-colors"
                                 >
                                     Clear Form
                                 </button>
                                 <button
-                                    onClick={handleSubmit}
+                                    type="submit"
                                     disabled={isSubmitting}
                                     className="flex justify-center items-center px-5 py-2.5 w-full sm:w-auto bg-[#16A34A] rounded-[10px] text-white font-inter font-medium text-sm shadow-[0px_1px_3px_rgba(0,0,0,0.1),0px_1px_2px_-1px_rgba(0,0,0,0.1)] hover:bg-[#15803d] transition-colors disabled:opacity-70"
                                 >
@@ -87,7 +89,7 @@ export function LeadLayoutGrid({ children, sidebar, titleBanner, isViewMode = fa
                                 </button>
                             </div>
                         )}
-                    </div>
+                    </form>
 
                     {/* Right Column (Sidebar Cards) */}
                     {sidebar && (

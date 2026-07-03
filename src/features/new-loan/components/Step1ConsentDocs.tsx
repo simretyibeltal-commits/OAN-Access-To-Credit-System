@@ -120,7 +120,7 @@ export function Step1ConsentDocs({ leadId }: { leadId?: string | undefined }) {
     if (typeof doc.id !== 'string' || !applicationId) return;
     try {
       const res = await loanService.deleteSupportingDocument(applicationId, doc.id);
-      // Frappe may return status === 'success' or message === 'File deleted successfully'.
+      // The backend may return status === 'success' or message === 'File deleted successfully'.
       const isSuccess = res?.status === 'success' || res?.message === 'File deleted successfully';
       if (!isSuccess) {
         logger.error('Failed to delete document on server', res);
