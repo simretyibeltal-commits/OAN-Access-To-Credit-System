@@ -326,7 +326,7 @@ const newLeadSlice = createSlice({
         state.callDetails = logsArray.map((log, index: number) => ({
           id: log.ref_id ? `${log.ref_id}-${index}` : `call-${index}`,
           status: log.source || 'Unknown',
-          timing: formatTiming(log.timestamp || '', ' • ', true)
+          timing: formatTiming(log.received || '', ' • ', true)
         }));
       })
       .addCase(fetchActivitiesThunk.fulfilled, (state, action) => {
