@@ -66,6 +66,7 @@ interface NewLeadState {
   leadPhoneNumber: string;
   leadFirstName: string;
   leadLastName: string;
+  verificationBlocked: boolean;
 }
 
 const getInitialDraft = (): NewLeadDraft => ({
@@ -91,6 +92,7 @@ const getInitialState = (): NewLeadState => ({
   leadPhoneNumber: '',
   leadFirstName: '',
   leadLastName: '',
+  verificationBlocked: false,
 });
 
 const initialState: NewLeadState = getInitialState();
@@ -291,6 +293,9 @@ const newLeadSlice = createSlice({
     },
     resetNewLeadDraft(state) {
       state.draft = getInitialDraft();
+    },
+    setVerificationBlocked(state, action: PayloadAction<boolean>) {
+      state.verificationBlocked = action.payload;
     }
   },
   extraReducers: (builder) => {
@@ -308,6 +313,7 @@ const newLeadSlice = createSlice({
           state.leadPhoneNumber = '';
           state.leadFirstName = '';
           state.leadLastName = '';
+          state.verificationBlocked = false;
         }
         state.isSubmitting = false;
       })
@@ -403,6 +409,7 @@ const newLeadSlice = createSlice({
       })
       .addCase(updateLeadStatusThunk.fulfilled, (state, action) => {
         state.leadStatus = action.payload.payload.status;
+        state.verificationBlocked = false;
       });
   }
 });
@@ -412,7 +419,8 @@ export const {
   setLeadStatus,
   addCreditInfo,
   updateNewLeadDraft,
-  resetNewLeadDraft
+  resetNewLeadDraft,
+  setVerificationBlocked
 } = newLeadSlice.actions;
 
 export { initializeLead, clearForm };
@@ -426,6 +434,7 @@ export const selectLeadSourcesOptions = (state: RootState) => state.newLead.lead
 export const selectLeadStatusesOptions = (state: RootState) => state.newLead.leadStatusesOptions;
 export const selectLoanTypesOptions = (state: RootState) => state.newLead.loanTypesOptions;
 export const selectCreditInfo = (state: RootState) => state.newLead.creditInfo;
+export const selectVerificationBlocked = (state: RootState) => state.newLead.verificationBlocked;
 export const selectCallDetails = (state: RootState) => state.newLead.callDetails;
 export const selectActivities = (state: RootState) => state.newLead.activities;
 export const selectIsSubmitting = (state: RootState) => state.newLead.isSubmitting;
