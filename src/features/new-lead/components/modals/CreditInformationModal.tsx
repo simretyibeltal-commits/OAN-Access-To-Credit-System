@@ -43,6 +43,10 @@ export function CreditInformationModal({ isOpen, onClose, onSubmit }: CreditInfo
 
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
+    // Stop the submit event from bubbling through the React portal to any
+    // ancestor <form> (e.g. LeadLayoutGrid), which would otherwise trigger
+    // an unintended create_lead submission.
+    e?.stopPropagation();
     // 1. Run local Zod schema validation
     const validationResult = creditInfoSchema.safeParse({ loanType, loanAmount, purposeMessage });
     if (!validationResult.success) {
