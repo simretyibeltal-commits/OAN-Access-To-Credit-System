@@ -65,7 +65,7 @@ export const handlers = [
       );
     }
 
-    // Map the mock format to the Frappe backend format expected by lead.service.ts
+    // Map the mock format to the backend format expected by lead.service.ts
     const mappedResults = filteredRows.map((row: any) => ({
       ...row,
       name: row.id,

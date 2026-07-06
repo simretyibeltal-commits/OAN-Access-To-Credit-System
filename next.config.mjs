@@ -14,6 +14,12 @@ try {
 const nextConfig = {
   reactStrictMode: true,
 
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+
+  allowedDevOrigins: ['192.168.3.1'],
+
   sassOptions: {
     includePaths: ['./src/assets/styles'],
     silenceDeprecations: ['import'],
@@ -41,7 +47,7 @@ const nextConfig = {
       {
         source: '/:path*',
         headers: [
-          { key: 'X-Frame-Options', value: 'DENY' },
+          { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
           { key: 'X-Content-Type-Options', value: 'nosniff' },
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
           {

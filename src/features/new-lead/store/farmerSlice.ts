@@ -15,7 +15,7 @@ interface FarmerState {
   detailsError: string | null;
   isPollingLong: boolean;
 }
-
+// dont know if image url is needed since
 export const createDefaultFarmerDetails = (partial?: Partial<FarmerDetails>): FarmerDetails => ({
   firstName: partial?.firstName ?? '',
   lastName: partial?.lastName ?? '',
@@ -23,6 +23,7 @@ export const createDefaultFarmerDetails = (partial?: Partial<FarmerDetails>): Fa
   phoneNumber: partial?.phoneNumber ?? '',
   email: partial?.email ?? '',
   gender: partial?.gender ?? '',
+  profileImageUrl: partial?.profileImageUrl ?? '',
 });
 
 const initialState: FarmerState = {
@@ -62,7 +63,7 @@ export const fetchLeadDetailsThunk = createAsyncThunk<
     let shouldPoll = typeof arg === 'string' ? false : (arg.shouldPoll ?? false);
 
     const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-    let maxRetries = shouldPoll ? 24 : 1; 
+    let maxRetries = shouldPoll ? 24 : 1;
     let retries = 0;
 
     let timeoutId: NodeJS.Timeout | undefined;
@@ -76,28 +77,18 @@ export const fetchLeadDetailsThunk = createAsyncThunk<
       while (retries < maxRetries) {
         try {
           const response = await newLeadService.getLeadDetails(leadId);
-          
-          // The backend specifically indicates a background demographic sync is in progress
-          // when the status is 'Pending OTP' but 'otp_verified' is true.
-          const isSyncInProgress = response.consent_request_status === 'Pending OTP' && response.consent_request_otp_verified === true;
-          
-          if (isSyncInProgress && !shouldPoll) {
-            shouldPoll = true;
-            maxRetries = 24; // dynamically enable polling
-            if (!timeoutId) {
-              timeoutId = setTimeout(() => {
-                dispatch(setIsPollingLong(true));
-              }, 2000);
-            }
-          }
 
           // Data has arrived if farmer_profile_created is true
           const dataArrived = response && response.farmer_profile_created === true;
-          
+
           if (dataArrived || !shouldPoll) {
             return response;
           }
-          
+
+          if (response.consent_request_status === 'Failed') {
+            return rejectWithValue("Demographic sync failed. Please request a new OTP and re-submit the consent.");
+          }
+
           logger.log(`Lead details not yet ready for leadId: ${leadId}. Retrying in 5 seconds... (Attempt ${retries + 1}/${maxRetries})`);
         } catch (error) {
           const message = error instanceof Error ? error.message : '';
@@ -111,16 +102,20 @@ export const fetchLeadDetailsThunk = createAsyncThunk<
           }
           logger.warn(`Failed to fetch lead details for leadId: ${leadId}. Error: ${error instanceof Error ? error.message : String(error)}. Retrying in 5 seconds... (Attempt ${retries + 1}/${maxRetries})`);
         }
-        
+
         retries++;
         if (retries < maxRetries) {
           await delay(5000);
         }
       }
-      
+
       // Final attempt before rejecting
       try {
-        return await newLeadService.getLeadDetails(leadId);
+        const finalResponse = await newLeadService.getLeadDetails(leadId);
+        if (shouldPoll && finalResponse.farmer_profile_created === false) {
+          return rejectWithValue("Demographic sync failed. Please request a new OTP and re-submit the consent.");
+        }
+        return finalResponse;
       } catch (error) {
         return rejectWithValue(error instanceof Error ? error.message : 'Unknown Cause: Failed to fetch lead details after retries');
       }
@@ -170,8 +165,26 @@ const farmerSlice = createSlice({
       .addCase(fetchLeadDetailsThunk.pending, (state) => {
         state.detailsError = null;
       })
+      // dont know the usecase ( be cautious of data leakage, this can be a cause)
       .addCase(fetchLeadDetailsThunk.fulfilled, (state, action) => {
-        state.farmerDetails = action.payload;
+        state.farmerDetails = {
+          ...state.farmerDetails,
+          firstName: action.payload.firstName || state.farmerDetails.firstName,
+          lastName: action.payload.lastName || state.farmerDetails.lastName,
+          phoneNumber: action.payload.phoneNumber || state.farmerDetails.phoneNumber,
+          email: action.payload.email || state.farmerDetails.email,
+          location: action.payload.location || state.farmerDetails.location,
+          gender: action.payload.gender || state.farmerDetails.gender,
+          websub_delivered_at: action.payload.websub_delivered_at,
+          consent_type: action.payload.consent_type,
+          purpose: action.payload.purpose,
+          validity_from: action.payload.validity_from,
+          validity_to: action.payload.validity_to,
+          requested_data_fields: action.payload.requested_data_fields,
+          farmer_profile_created: action.payload.farmer_profile_created,
+          consent_request_status: action.payload.consent_request_status,
+          consent_request_otp_verified: action.payload.consent_request_otp_verified,
+        };
         state.detailsError = null;
       })
       .addCase(fetchLeadDetailsThunk.rejected, (state, action) => {
@@ -181,7 +194,7 @@ const farmerSlice = createSlice({
       .addCase(initializeLead, (state, action) => {
         const payload = action.payload ?? {};
         state.farmerId = payload.farmerId ?? '';
-        state.farmerDetails = createDefaultFarmerDetails(payload.farmerDetails);
+        state.farmerDetails = createDefaultFarmerDetails(); // Don't load details from initial lead
         state.searchedFarmer = null;
         state.isSearchingFarmer = false;
         state.searchError = null;
