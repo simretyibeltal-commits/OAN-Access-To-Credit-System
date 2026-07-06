@@ -1,10 +1,11 @@
 import { logger } from '@/lib/logger';
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { X, CheckCircle2, User, Lock, Building2, Loader2, Eye, EyeOff } from 'lucide-react';
+import { X, CheckCircle2, User, Lock, Building2, Loader2, Eye, EyeOff, FileText, Sprout, Coins } from 'lucide-react';
 import { LoanTableRow } from '../LoanTable';
 import { loanService, LoanApplicationFull } from '../../api/loan.service';
 import { maskSensitiveId } from '@/lib/utils';
+import { FORM_SECTIONS, mapApiToFarmerDetails } from '@/features/loans/constants/form-sections';
 
 interface LoanApplicationModalProps {
   isOpen: boolean;
@@ -12,10 +13,31 @@ interface LoanApplicationModalProps {
   data: LoanTableRow | null;
 }
 
-const Field = ({ label, value, sensitive = false }: { label: string; value: string | null | undefined; sensitive?: boolean }) => {
+const Field = ({ label, value, sensitive = false, isList = false }: { label: string; value: string | null | undefined; sensitive?: boolean, isList?: boolean }) => {
   const [revealed, setRevealed] = useState(false);
   const hasValue = !!value && value.trim() !== '';
-  const display = sensitive && hasValue && !revealed ? maskSensitiveId(value) : value;
+
+  if (isList) {
+    const listItems = hasValue ? value!.split(',').map(s => s.trim()).filter(Boolean) : [];
+    return (
+      <div className="flex flex-col">
+        <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">{label}</span>
+        {listItems.length > 0 ? (
+          <div className="flex flex-wrap gap-2">
+            {listItems.map((item, idx) => (
+              <div key={idx} className="bg-gray-50 border border-gray-200 rounded-md px-2 py-1 text-[13px] font-bold text-gray-800">
+                {item}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <span className="text-[15px] font-bold text-gray-800">—</span>
+        )}
+      </div>
+    );
+  }
+
+  const display = sensitive && hasValue && !revealed ? maskSensitiveId(value!) : value;
 
   return (
     <div className="flex flex-col">
@@ -36,6 +58,15 @@ const Field = ({ label, value, sensitive = false }: { label: string; value: stri
     </div>
   );
 };
+
+const SECTION_ICONS: Record<string, any> = {
+  'Loan Details': Lock,
+  'Basic Information': User,
+  'Socio Economic Information': Coins,
+  'Land, Crop and Livestock Information': Sprout,
+  'Agronomic Data': FileText,
+};
+
 
 export default function LoanApplicationModal({ isOpen, onClose, data }: LoanApplicationModalProps) {
   const [mounted, setMounted] = useState(false);
@@ -65,6 +96,8 @@ export default function LoanApplicationModal({ isOpen, onClose, data }: LoanAppl
   }, [isOpen, data?.application_id, data?.id]);
 
   if (!mounted || !isOpen || !data) return null;
+
+  const farmerDetails = fullProfile ? mapApiToFarmerDetails(fullProfile) : null;
 
   const modalContent = (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-[#0F172A]/40 backdrop-blur-sm overflow-y-auto">
@@ -100,71 +133,55 @@ export default function LoanApplicationModal({ isOpen, onClose, data }: LoanAppl
         {/* Body content */}
         <div className="px-8 py-8 overflow-y-auto max-h-[60vh] space-y-10 custom-scrollbar">
 
-          {/* Section 1: Farmer Information */}
-          <section>
-            <div className="flex items-center gap-2 mb-6">
-              <User size={20} className="text-[#3b5998]" fill="#3b5998" />
-              <h4 className="text-[17px] font-bold text-gray-900">Farmer Information</h4>
-            </div>
-            {isLoading ? (
-              <div className="flex items-center justify-center py-8">
-                <Loader2 className="w-6 h-6 animate-spin text-[#387f50]" />
-              </div>
-            ) : (
-              <div className="grid grid-cols-3 gap-y-6 gap-x-8">
-                <Field label="FULL NAME" value={fullProfile ? `${fullProfile.first_name} ${fullProfile.last_name}` : data.applicant} />
-                <Field label="FATHER'S NAME" value={fullProfile?.father_name || null} />
-                <Field label="FARMER ID" value={fullProfile?.farmer_id || null} />
-                <Field label="DATE OF BIRTH" value={fullProfile?.date_of_birth || null} />
-                <Field label="GENDER" value={fullProfile?.gender || null} />
-                <Field label="MARITAL STATUS" value={fullProfile?.marital_status || null} />
-                <Field label="MOBILE PHONE" value={fullProfile?.phone_number || data.phone || null} />
-                <Field label="EDUCATION LEVEL" value={fullProfile?.education_level || null} />
-                <Field label="NATIONAL ID" value={fullProfile?.national_id || null} sensitive />
-                <Field label="REGION" value={fullProfile?.location || data.region || null} />
-                <Field label="WOREDA" value={fullProfile?.woreda || null} />
-                <Field label="KEBELE" value={fullProfile?.kebele || null} />
-              </div>
-            )}
-          </section>
+          {/* Dynamic Sections from FORM_SECTIONS */}
+          {FORM_SECTIONS.map((section) => {
+            const Icon = SECTION_ICONS[section.title] || Building2;
+            return (
+              <section key={section.title}>
+                <div className="flex items-center gap-2 mb-6">
+                  <Icon size={20} className="text-[#3b5998]" fill="#3b5998" />
+                  <h4 className="text-[17px] font-bold text-gray-900">{section.title}</h4>
+                </div>
+                {isLoading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <Loader2 className="w-6 h-6 animate-spin text-[#387f50]" />
+                  </div>
+                ) : (
+                  <div className={`grid gap-y-6 gap-x-8 ${section.gridCols || 'lg:grid-cols-3'}`}>
+                    {section.fields.map((field) => (
+                      <Field
+                        key={field.key}
+                        label={field.label}
+                        value={farmerDetails ? farmerDetails[field.key] : ''}
+                        sensitive={!!field.sensitive}
+                        isList={!!field.isList}
+                      />
+                    ))}
+                  </div>
+                )}
+              </section>
+            );
+          })}
 
-          {/* Section 2: Loan Details */}
-          <section>
-            <div className="flex items-center gap-2 mb-6">
-              <Lock size={20} className="text-[#bfae34]" fill="#bfae34" />
-              <h4 className="text-[17px] font-bold text-gray-900">Loan Details</h4>
-            </div>
-            {isLoading ? (
-              <div className="flex items-center justify-center py-8">
-                <Loader2 className="w-6 h-6 animate-spin text-[#387f50]" />
-              </div>
-            ) : (
-              <div className="grid grid-cols-3 gap-y-6 gap-x-8">
-                <Field label="LOAN TYPE" value={fullProfile?.loan_type || data.type || null} />
-                <Field label="PURPOSE" value={fullProfile?.loan_reason || fullProfile?.purpose || null} />
-                <Field label="REQUESTED AMOUNT" value={fullProfile?.loan_amount ? `ETB ${fullProfile.loan_amount.toLocaleString()}` : (data.loanAmount || null)} />
-                <Field label="DURATION" value={fullProfile?.duration || null} />
-                <Field label="PRIMARY CROPS" value={fullProfile?.primary_crops || null} />
-                <Field label="CROP VARIETY" value={fullProfile?.crop_variety || null} />
-                <Field label="LAND SIZE" value={fullProfile?.farmland_size_hectares ? `${fullProfile.farmland_size_hectares} Hectares` : null} />
-                <Field label="EXPECTED YIELD" value={fullProfile?.expected_yield != null ? String(fullProfile.expected_yield) : null} />
-              </div>
-            )}
-          </section>
-
-          {/* Section 3: Banking Information */}
-          <section>
+          {/* Section: Banking Information (Extra, since it's not in Step2FarmerDetails) */}
+          {/* <section>
             <div className="flex items-center gap-2 mb-6">
               <Building2 size={20} className="text-[#5f6e7a]" fill="#5f6e7a" />
               <h4 className="text-[17px] font-bold text-gray-900">Banking Information</h4>
             </div>
-            <div className="grid grid-cols-3 gap-y-6 gap-x-8">
-              <Field label="BANK ACCOUNT NO." value={fullProfile?.bank_account_no || null} />
-              <Field label="IFSC / FSC CODE" value={fullProfile?.ifsc_code || null} />
-              <Field label="BANK NAME" value={fullProfile?.bank_name || null} />
-              <Field label="ACCOUNT HOLDER" value={fullProfile?.account_holder || null} />
-            </div>
-          </section>
+            {isLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="w-6 h-6 animate-spin text-[#387f50]" />
+              </div>
+            ) : (
+              <div className="grid grid-cols-3 gap-y-6 gap-x-8">
+                <Field label="BANK ACCOUNT NO." value={fullProfile?.bank_account_no || null} />
+                <Field label="IFSC / FSC CODE" value={fullProfile?.ifsc_code || null} />
+                <Field label="BANK NAME" value={fullProfile?.bank_name || null} />
+                <Field label="ACCOUNT HOLDER" value={fullProfile?.account_holder || null} />
+              </div>
+            )}
+          </section> */}
 
         </div>
 
