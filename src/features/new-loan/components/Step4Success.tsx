@@ -115,7 +115,10 @@ export function Step4Success() {
 
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center justify-center gap-4 pb-2">
-            <button className="flex flex-1 sm:flex-none justify-center items-center gap-2 rounded-md border border-gray-300 bg-white px-6 py-2.5 text-sm font-bold text-gray-700 shadow-sm hover:bg-gray-50 transition-colors">
+            <button 
+              onClick={() => window.print()}
+              className="flex flex-1 sm:flex-none justify-center items-center gap-2 rounded-md border border-gray-300 bg-white px-6 py-2.5 text-sm font-bold text-gray-700 shadow-sm hover:bg-gray-50 transition-colors"
+            >
               <Download size={16} /> Download PDF
             </button>
             <button
