@@ -5,13 +5,14 @@ import { useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
 import { useAppDispatch } from '@/store/hooks';
 import LeadStatusModal, { LeadStatusOutcome } from '@/features/new-lead/components/modals/LeadStatusModal';
-import { updateLeadStatusThunk } from '@/features/new-lead/store/newLeadSlice';
+import { updateLeadStatusThunk, setVerificationBlocked } from '@/features/new-lead/store/newLeadSlice';
 import { createAndVerifyLoanApplicationThunk, setApplicationId } from '@/features/new-loan/store/newLoanFormSlice';
 import { loanService } from '@/features/loans/api/loan.service';
 import { FeedbackModal } from '@/components/ui/FeedbackModal';
 import { Button } from './Button';
 import { normalizeLeadId } from '@/lib/utils';
 import { logger } from '@/lib/logger';
+import { ApiError } from '@/lib/api/fetchApi';
 
 interface LeadDashboardActionsProps {
     leadId: string;
@@ -22,6 +23,7 @@ export function LeadDashboardActions({ leadId, status }: LeadDashboardActionsPro
     const [modalAction, setModalAction] = useState<'verify' | 'reject' | null>(null);
     const [isCreatingApp, setIsCreatingApp] = useState(false);
     const [createAppError, setCreateAppError] = useState<string | null>(null);
+    const [statusError, setStatusError] = useState<string | null>(null);
     const [existingAppId, setExistingAppId] = useState<string | null>(null);
     const [checkingExisting, setCheckingExisting] = useState(false);
     const dispatch = useAppDispatch();
@@ -79,10 +81,23 @@ export function LeadDashboardActions({ leadId, status }: LeadDashboardActionsPro
             if (outcome === 'Rejected') {
                 router.push('/leads');
             }
-        } catch (e) {
-            logger.error('Failed to update lead status:', e);
+            setModalAction(null);
+        } catch (e: any) {
+            const errorMessage = typeof e === 'string' ? e : e?.message || 'Failed to update lead status. Please try again.';
+            // Business-rule rejections (e.g. missing credit info/consent) come back as a 4xx and are
+            // already shown to the user via the modal + section highlights, so they don't warrant a
+            // log. Only genuinely unexpected failures (5xx, network, non-ApiError throws) are logged.
+            const status = e instanceof ApiError ? e.status : undefined;
+            const isExpectedValidationError = status !== undefined && status >= 400 && status < 500;
+            if (!isExpectedValidationError) {
+                logger.warn('Failed to update lead status:', e);
+            }
+            if (outcome === 'Verified') {
+                dispatch(setVerificationBlocked(true));
+            }
+            setModalAction(null);
+            setStatusError(errorMessage);
         }
-        setModalAction(null);
     };
 
     const isFinalized = ['rejected', 'processed', 'granted'].includes(status?.toLowerCase() || '');
@@ -155,6 +170,14 @@ export function LeadDashboardActions({ leadId, status }: LeadDashboardActionsPro
                 type="error"
                 title="Application Failed"
                 message={createAppError || ''}
+            />
+
+            <FeedbackModal
+                isOpen={!!statusError}
+                onClose={() => setStatusError(null)}
+                type="error"
+                title="Unable to Update Status"
+                message={statusError || ''}
             />
 
             <LeadStatusModal

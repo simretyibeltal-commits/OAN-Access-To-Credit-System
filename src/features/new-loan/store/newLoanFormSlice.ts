@@ -2,7 +2,6 @@ import { logger } from '@/lib/logger';
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { loanService, type LoanApplicationSummary } from '@/features/loans/api/loan.service';
 import { newLeadService } from '@/features/new-lead/api/newLead.service';
-import { updateLeadStatusThunk } from '../../new-lead/store/newLeadSlice';
 import type { RootState } from '../../../store';
 import { normalizeLeadId } from '@/lib/utils';
 
@@ -24,6 +23,7 @@ interface SupportingDoc {
 
 interface LoanFormState {
   currentStep: number;
+  leadId: string | null;
   applicationId: string | null;
   consentRequestData: ConsentRequestData | null;
   otpVerified: boolean;
@@ -64,6 +64,7 @@ const loadInitialState = (): LoanFormState => {
   }
   return {
     currentStep: 1,
+    leadId: null,
     applicationId: null,
     consentRequestData: null,
     otpVerified: false,
@@ -110,12 +111,6 @@ export const createAndVerifyLoanApplicationThunk = createAsyncThunk<
   async (leadId: string, { dispatch, rejectWithValue }) => {
     try {
       const appId = await dispatch(createLoanApplicationAPI(leadId)).unwrap();
-      await dispatch(updateLeadStatusThunk({
-        leadId,
-        status: 'Verified',
-        reason: 'Loan application created.'
-      })).unwrap();
-
       dispatch(setApplicationId(appId));
       return appId;
     } catch (err) {
@@ -272,6 +267,9 @@ export const newLoanFormSlice = createSlice({
     setApplicationId: (state, action: PayloadAction<string>) => {
       state.applicationId = action.payload;
     },
+    setLeadId: (state, action: PayloadAction<string>) => {
+      state.leadId = action.payload;
+    },
     setStep: (state, action: PayloadAction<number>) => {
       state.currentStep = action.payload;
     },
@@ -294,6 +292,7 @@ export const newLoanFormSlice = createSlice({
     resetForm: () => {
       return {
         currentStep: 1,
+        leadId: null,
         applicationId: null,
         consentRequestData: null,
         otpVerified: false,
@@ -387,6 +386,7 @@ export const newLoanFormSlice = createSlice({
 export const {
   setFormData,
   setApplicationId,
+  setLeadId,
   setStep,
   nextStep,
   prevStep,
@@ -398,5 +398,6 @@ export const {
 
 export const selectLoanFormState = (state: RootState) => state.loanForm;
 export const selectLoanCurrentStep = (state: RootState) => state.loanForm.currentStep;
+export const selectLoanLeadId = (state: RootState) => state.loanForm.leadId;
 
 export const loanFormReducer = newLoanFormSlice.reducer;

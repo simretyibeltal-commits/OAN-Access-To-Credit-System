@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { selectFarmerState, setFarmerId, searchFarmerThunk } from '../store/farmerSlice';
 import { selectConsentState, searchFarmerConsent } from '../store/consentSlice';
+import { selectVerificationBlocked } from '../store/newLeadSlice';
 import { selectOfficerName } from '@/features/auth/store/authSlice';
 import { CheckCircle2, AlertCircle, ShieldCheck } from 'lucide-react';
 import { useParams } from 'next/navigation';
@@ -17,8 +18,9 @@ const ConsentDetailsModal = dynamic(() => import('./modals/ConsentDetailsModal')
 
 export function ConsentManagementSection() {
   const dispatch = useAppDispatch();
-  const { farmerId, isSearchingFarmer, searchedFarmer, farmerDetails, searchError } = useAppSelector(selectFarmerState);
+  const { farmerId, isSearchingFarmer, searchedFarmer, farmerDetails, searchError, detailsError } = useAppSelector(selectFarmerState);
   const { isLoadingConsent, consentError, isOtpVerified, consentDate } = useAppSelector(selectConsentState);
+  const verificationBlocked = useAppSelector(selectVerificationBlocked);
   const officerName = useAppSelector(selectOfficerName) || 'AgriBank';
   const params = useParams();
   const leadId = params?.id as string;
@@ -26,7 +28,19 @@ export function ConsentManagementSection() {
   const [isConsentModalOpen, setIsConsentModalOpen] = useState(false);
   const [maskedPhone, setMaskedPhone] = useState<string>('');
 
-  const isVerified = isOtpVerified || !!consentDate || !!farmerDetails?.firstName;
+  const isProfileCreated = !!farmerDetails?.farmer_profile_created || !!farmerDetails?.firstName;
+  const isFinalizingConsent = isOtpVerified && !consentDate;
+  
+  // Only consider sync in progress if we are actively tracking it in this session (isOtpVerified = true)
+  const isSyncInProgress = isOtpVerified &&
+                           farmerDetails?.consent_request_status !== 'Pending OTP' && 
+                           farmerDetails?.consent_request_otp_verified === true && 
+                           farmerDetails?.farmer_profile_created === false;
+
+  const isVerified = isProfileCreated || isFinalizingConsent || (isSyncInProgress && !detailsError);
+
+  // Highlight as a verification blocker only if a verify attempt failed and consent is not yet approved.
+  const isMissingForVerification = verificationBlocked && !isVerified;
 
   // Dispatches an OTP request and refreshes the masked phone. Returns true on success.
   const requestOtp = async (): Promise<boolean> => {
@@ -58,11 +72,17 @@ export function ConsentManagementSection() {
   };
 
   return (
-    <section className="flex flex-col items-center pb-6 gap-4 w-full bg-white border border-[#F1F3F4] shadow-[0px_4px_6px_-1px_rgba(0,0,0,0.05),0px_2px_4px_-1px_rgba(0,0,0,0.03)] hover:-translate-y-1 hover:shadow-lg transition-all duration-300 rounded-xl">
+    <section className={`flex flex-col items-center pb-6 gap-4 w-full bg-white border shadow-[0px_4px_6px_-1px_rgba(0,0,0,0.05),0px_2px_4px_-1px_rgba(0,0,0,0.03)] hover:-translate-y-1 hover:shadow-lg transition-all duration-300 rounded-xl ${isMissingForVerification ? 'border-[#EF4444] border-l-4' : 'border-[#F1F3F4]'}`}>
       <div className="flex flex-row items-center p-5 w-full border-b border-[#dedede]">
         <h2 className="font-inter font-semibold text-lg leading-7 flex items-center gap-2 text-[#232F34]">
           <ShieldCheck size={20} className="text-[#6B7280]" />
           Consent Management
+          {isMissingForVerification && (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-[#FEF2F2] border border-[#FECACA] rounded-md text-[#DC2626] text-xs font-medium">
+              <AlertCircle size={12} />
+              Required for verification
+            </span>
+          )}
         </h2>
       </div>
 
@@ -77,13 +97,15 @@ export function ConsentManagementSection() {
             </div>
             <div className="flex flex-row items-center gap-1.5">
               <CheckCircle2 size={20} className="text-[#16A34A]" fill="#16A34A" color="white" />
-              <button
-                type="button"
-                onClick={() => setIsConsentModalOpen(true)}
-                className="text-[14px] font-bold text-[#16A34A] leading-[20px] hover:underline cursor-pointer focus:outline-none"
-              >
-                View Consent Details
-              </button>
+              {farmerDetails?.requested_data_fields && farmerDetails.requested_data_fields.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setIsConsentModalOpen(true)}
+                  className="text-[14px] font-bold text-[#16A34A] leading-[20px] hover:underline cursor-pointer focus:outline-none"
+                >
+                  View Consent Details
+                </button>
+              )}
               <span className="text-[14px] font-medium text-[#6B7280] leading-[20px] ml-1">
                 {consentDate ? `provided on ${consentDate}` : 'verified via registry'}
               </span>

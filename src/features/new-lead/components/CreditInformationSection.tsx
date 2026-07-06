@@ -1,18 +1,22 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
-import { selectCreditInfo, selectIsLeadFinalized, addCreditInfoThunk, fetchCreditInfoThunk } from '../store/newLeadSlice';
+import { selectCreditInfo, selectIsLeadFinalized, selectVerificationBlocked, addCreditInfoThunk, fetchCreditInfoThunk } from '../store/newLeadSlice';
 import { CreditInformationModal } from './modals/CreditInformationModal';
-import { CreditCard } from 'lucide-react';
+import { CreditCard, AlertCircle } from 'lucide-react';
 import { type CreditInfoFormData } from '../schemas/credit.schema';
 
 export function CreditInformationSection() {
   const dispatch = useAppDispatch();
   const creditInfo = useAppSelector(selectCreditInfo);
   const isFinalized = useAppSelector(selectIsLeadFinalized);
+  const verificationBlocked = useAppSelector(selectVerificationBlocked);
   const params = useParams();
   const leadId = params?.id as string;
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Highlight as a verification blocker only if a verify attempt failed and no credit info exists yet.
+  const isMissingForVerification = verificationBlocked && creditInfo.length === 0;
 
   useEffect(() => {
     if (leadId) {
@@ -33,11 +37,17 @@ export function CreditInformationSection() {
   };
 
   return (
-    <section className="flex flex-col items-center pb-6 gap-6 w-full bg-white border border-[#F1F3F4] shadow-[0px_4px_6px_-1px_rgba(0,0,0,0.05),0px_2px_4px_-1px_rgba(0,0,0,0.03)] hover:-translate-y-1 hover:shadow-lg transition-all duration-300 rounded-xl">
+    <section className={`flex flex-col items-center pb-6 gap-6 w-full bg-white border shadow-[0px_4px_6px_-1px_rgba(0,0,0,0.05),0px_2px_4px_-1px_rgba(0,0,0,0.03)] hover:-translate-y-1 hover:shadow-lg transition-all duration-300 rounded-xl ${isMissingForVerification ? 'border-[#EF4444] border-l-4' : 'border-[#F1F3F4]'}`}>
       <div className="flex flex-row justify-between items-center p-5 pt-4 pb-4 w-full border-b border-[#F1F3F4] font-semibold">
         <h2 className="font-inter font-semibold text-lg leading-7 flex items-center gap-2 text-[#232F34]">
           <CreditCard size={20} className="text-[#6B7280]" />
           Credit Information
+          {isMissingForVerification && (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-[#FEF2F2] border border-[#FECACA] rounded-md text-[#DC2626] text-xs font-medium">
+              <AlertCircle size={12} />
+              Required for verification
+            </span>
+          )}
         </h2>
         {!isFinalized && (
           <button
